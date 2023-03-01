@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Panel } from './Panel';
 import { OpenAIStream } from './OpenAI';
+import { loaderMessage } from './utils/loaderMessage';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -42,10 +43,11 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       try {
+        loaderMessage("Please wait...");
         const { data } = await OpenAIStream(selectedText);
         Panel.createOrShow(context.extensionUri, data.choices[0].text || 'No answer found');
       } catch (err) {
-        vscode.window.showInformationMessage(`❌ ${err}`);
+        vscode.window.showInformationMessage((err as Error).message);
       }
     })
   );
