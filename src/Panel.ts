@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getNonce } from './utils/getNounce';
+import { getNonce } from './utils';
 
 export class Panel {
   /**
