@@ -3,7 +3,7 @@ import { Panel } from './Panel';
 import { OpenAIStream } from './OpenAI';
 import { loaderMessage } from './utils/loaderMessage';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
-import { replaceWithUnicodes } from './utils';
+import { parseOpenAIResponse, replaceWithUnicodes } from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -27,7 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         loaderMessage("Please wait...");
         const { data } = await OpenAIStream(comment!);
-        Panel.createOrShow(context.extensionUri, data.choices[0].text!);
+        const response = parseOpenAIResponse(data);
+        Panel.createOrShow(context.extensionUri, response!);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);
       }
@@ -42,6 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInputBox({
         placeHolder: 'Ask me anything 🤖'
       }).then(async (value) => {
+        if (!value) {return;}
         // const editor = vscode.window.activeTextEditor;
         // if (!editor) {
         //   return vscode.window.showErrorMessage("Select code");
@@ -55,7 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
         try {
           loaderMessage("Please wait...");
           const { data } = await OpenAIStream(value!);
-          Panel.createOrShow(context.extensionUri, replaceWithUnicodes(data.choices[0].text!));
+          const response = parseOpenAIResponse(data);
+          Panel.createOrShow(context.extensionUri, replaceWithUnicodes(response!));
         } catch (err) {
           vscode.window.showErrorMessage((err as Error).message);
         }
@@ -75,7 +78,8 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         loaderMessage("Please wait...");
         const { data } = await OpenAIStream(`${selectedText}. Explain how this code works:`);
-        Panel.createOrShow(context.extensionUri, data.choices[0].text!);
+        const response = parseOpenAIResponse(data);
+        Panel.createOrShow(context.extensionUri, response!);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);
       }
