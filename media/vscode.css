@@ -103,6 +103,10 @@ textarea::placeholder {
 }
 
 #content {
+	overflow-wrap: break-word;
+  white-space: pre-wrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 	padding: 20px 0px;
 }
 
@@ -110,9 +114,12 @@ textarea::placeholder {
 	border-radius: 4px;
 }
 
-.clipboard {
+#clipboard {
+	display: flex;
+	width: fit-content;
 	position: absolute;
-	padding: 6px;
+	border-radius: 8px;
+	padding: 4px 6px;
 	cursor: pointer;
 	top: 12px;
 	right: 10px;

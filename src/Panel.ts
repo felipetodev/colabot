@@ -100,8 +100,11 @@ export class Panel {
 
     this._panel.webview.html = this._getHtmlForWebview(webview);
     webview.onDidReceiveMessage(async (data) => {
-      console.log({ dataType: data.type });
       switch (data.type) {
+        case 'copyToClipboard': {
+          await vscode.env.clipboard.writeText(data.text);
+          vscode.window.showInformationMessage("Copy to clipboard!");
+        }
         case 'onInfo': {
           if (!data.value) {
             return;
@@ -155,21 +158,21 @@ export class Panel {
 			</head>
       <body id="main">
         <div id="container">
-          <span class="clipboard">
+          <button id="clipboard">
             <svg height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg">
               <g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" transform="translate(3 3)">
                 <path d="m11.5 9.5v-7c0-1.1045695-.8954305-2-2-2h-7c-1.1045695 0-2 .8954305-2 2v7c0 1.1045695.8954305 2 2 2h7c1.1045695 0 2-.8954305 2-2z"/>
                 <path d="m3.5 11.5v1c0 1.1045695.8954305 2 2 2h7c1.1045695 0 2-.8954305 2-2v-7c0-1.1045695-.8954305-2-2-2h-1"/>
               </g>
             </svg>
-          </span>
+          </button>
           <h1>
             Explain Code:
           </h1>
           <div id="content">
             ${this._selectedText}
           </div>
-          <button onclick="">Close</button>
+          <button id="close">Close</button>
         </div>
 			</body>
       <script src="${scriptUri}" nonce="${nonce}">
