@@ -5,13 +5,13 @@ export async function OpenAIStream(selectedText: string) {
   const openai = new OpenAIApi(new Configuration({ apiKey: 'YOUR_API_KEY' }));
   try {
     const completion = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: `${selectedText} Explain how this code works:`,
-      temperature: 0.7,
+      model: 'gpt-3.5-turbo',
+      prompt: selectedText,
+      temperature: 0.3,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
-      max_tokens: 200,
+      max_tokens: 1500,
       stream: false,
       n: 1,
     });
