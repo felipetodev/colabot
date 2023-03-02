@@ -1,6 +1,6 @@
 {
-  "name": "cohere-vscode",
-  "displayName": "cohere-vscode",
+  "name": "colabot-vscode",
+  "displayName": "colabot-vscode",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -9,26 +9,31 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:cohere-vscode.helloWorld"
-  ],
   "main": "./out/extension.js",
   "contributes": {
+    "keybindings": [
+      {
+        "command": "colabot-vscode.getCode",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i",
+        "when": "editorTextFocus"
+      }
+    ],
     "commands": [
       {
-        "command": "cohere-vscode.helloWorld",
-        "title": "Hello World",
-        "category": "Cohere"
+        "command": "colabot-vscode.getCode",
+        "title": "Get Code",
+        "category": "ColaBOT"
       },
       {
-        "command": "cohere-vscode.doSomething",
-        "title": "Do Something",
-        "category": "Cohere"
+        "command": "colabot-vscode.askCode",
+        "title": "Ask ColaBOT",
+        "category": "ColaBOT"
       },
       {
-        "command": "cohere-vscode.helloWebviews",
-        "title": "Webviews",
-        "category": "Cohere"
+        "command": "colabot-vscode.explainCode",
+        "title": "Explain ColaBOT",
+        "category": "ColaBOT"
       }
     ]
   },
