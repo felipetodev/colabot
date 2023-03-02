@@ -3,6 +3,7 @@ import { Panel } from './Panel';
 import { OpenAIStream } from './OpenAI';
 import { loaderMessage } from './utils/loaderMessage';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
+import { replaceWithUnicodes } from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -37,20 +38,28 @@ export function activate(context: vscode.ExtensionContext) {
    * WIP: another use cases
    */
   context.subscriptions.push(
-    vscode.commands.registerCommand('cohere-vscode.doSomething', async () => {
-      const answer = await vscode.window.showInformationMessage(
-        'Hello from DO SOMETHING 🚀',
-        'OK',
-        'Cancel'
-      );
-
-      if (answer === 'OK') {
-        vscode.window.showInformationMessage('OK');
-      }
-
-      if (answer === 'Cancel') {
-        vscode.window.showInformationMessage('Sorry to hear that!');
-      }
+    vscode.commands.registerCommand('colabot-vscode.askCode', async () => {
+      vscode.window.showInputBox({
+        placeHolder: 'Ask me anything 🤖'
+      }).then(async (value) => {
+        // const editor = vscode.window.activeTextEditor;
+        // if (!editor) {
+        //   return vscode.window.showErrorMessage("Select code");
+        // }
+        // const lang = editor.document.languageId;
+        // const isLanguageSupported = languageSupportsComments(lang);
+  
+        // if (!isLanguageSupported) {
+        //   return vscode.window.showErrorMessage("Language not supported");
+        // }
+        try {
+          loaderMessage("Please wait...");
+          const { data } = await OpenAIStream(value!);
+          Panel.createOrShow(context.extensionUri, replaceWithUnicodes(data.choices[0].text!));
+        } catch (err) {
+          vscode.window.showErrorMessage((err as Error).message);
+        }
+      });
     })
   );
 
