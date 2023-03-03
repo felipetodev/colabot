@@ -1,4 +1,4 @@
-import { type CreateChatCompletionResponse } from 'openai';
+import type { CreateChatCompletionResponse } from 'openai';
 
 export function getNonce() {
   let text = '';
@@ -14,5 +14,5 @@ export function replaceWithUnicodes(val: string) {
 }
 
 export function parseOpenAIResponse(data: CreateChatCompletionResponse) {
-  return data.choices[0].message?.content;
+  return data.choices[0].message?.content!;
 }

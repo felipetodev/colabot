@@ -28,37 +28,43 @@ export function activate(context: vscode.ExtensionContext) {
         loaderMessage("Please wait...");
         const { data } = await OpenAIStream(comment!);
         const response = parseOpenAIResponse(data);
-        Panel.createOrShow(context.extensionUri, response!);
+        Panel.createOrShow(context.extensionUri, response);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);
       }
     })
   );
 
-  /**
-   * WIP: another use cases
-   */
   context.subscriptions.push(
     vscode.commands.registerCommand('colabot-vscode.askCode', async () => {
+      const editor = vscode.window.activeTextEditor;
+      let askWithCodeSelection = '';
+      if (editor) {
+        const selection = editor.selection;
+        const selectedText = editor.document.getText(selection);
+        // validate selection and selection length
+        if (selectedText && !selectedText.trim() || selectedText.trim().length < 8) {
+          return vscode.window.showWarningMessage('Please do a better selection');
+        }
+        if (selectedText) {
+          askWithCodeSelection = selectedText;
+        }
+      }
       vscode.window.showInputBox({
         placeHolder: 'Ask me anything 🤖'
       }).then(async (value) => {
         if (!value) {return;}
-        // const editor = vscode.window.activeTextEditor;
-        // if (!editor) {
-        //   return vscode.window.showErrorMessage("Select code");
-        // }
-        // const lang = editor.document.languageId;
-        // const isLanguageSupported = languageSupportsComments(lang);
-  
-        // if (!isLanguageSupported) {
-        //   return vscode.window.showErrorMessage("Language not supported");
-        // }
+        if (value.trim().length < 8) {
+          return vscode.window.showWarningMessage('Please give some more information');
+        }
         try {
           loaderMessage("Please wait...");
+          if (askWithCodeSelection) {
+            value = `${askWithCodeSelection}\n ${value}:`;
+          }
           const { data } = await OpenAIStream(value!);
           const response = parseOpenAIResponse(data);
-          Panel.createOrShow(context.extensionUri, replaceWithUnicodes(response!));
+          Panel.createOrShow(context.extensionUri, replaceWithUnicodes(response));
         } catch (err) {
           vscode.window.showErrorMessage((err as Error).message);
         }
@@ -79,7 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
         loaderMessage("Please wait...");
         const { data } = await OpenAIStream(`${selectedText}. Explain how this code works:`);
         const response = parseOpenAIResponse(data);
-        Panel.createOrShow(context.extensionUri, response!);
+        Panel.createOrShow(context.extensionUri, response);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);
       }
