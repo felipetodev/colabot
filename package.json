@@ -11,6 +11,18 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "menus": {
+      "editor/context": [
+        {
+          "command": "colabot-vscode.askCode",
+          "group": "colabot_commands"
+        },
+        {
+          "command": "colabot-vscode.explainCode",
+          "group": "colabot_commands"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "colabot-vscode.getCode",
