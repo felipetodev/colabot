@@ -47,7 +47,46 @@
         "title": "Explain ColaBOT",
         "category": "ColaBOT"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "ColaBOT 🤖",
+      "type": "object",
+      "properties": {
+        "colaBot.apiKey": {
+          "type": "string",
+          "description": "To use ColaBOT, you need an API key from OpenAI or Cohere",
+          "default": "openai",
+          "enum": [
+            "openai",
+            "cohere"
+          ],
+          "order": 1
+        },
+        "colaBot.model": {
+          "type": "string",
+          "description": "The model to use for ColaBOT",
+          "default": "gpt-3.5-turbo",
+          "enum": [
+            "gpt-3.5-turbo",
+            "text-davinci-003",
+            "summarize-xlarge"
+          ],
+          "order": 2
+        },
+        "colaBot.maxTokens": {
+          "type": "number",
+          "description": "The maximum number of tokens to generate",
+          "default": 1500,
+          "order": 3
+        },
+        "colaBot.temperature": {
+          "type": "number",
+          "description": "The temperature of the model (between 0 and 1)",
+          "default": 0.3,
+          "order": 4
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
