@@ -3,7 +3,7 @@ import { Panel } from './Panel';
 import { OpenAIStream } from './OpenAI';
 import { loaderMessage } from './utils/loaderMessage';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
-import { parseOpenAIResponse, replaceWithUnicodes } from './utils';
+import { replaceWithUnicodes } from './utils';
 import ApiKeySettings from './apiKeySettings';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -43,8 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
     
       try {
         loaderMessage("Please wait...");
-        const { data } = await OpenAIStream(comment, API_KEY!);
-        const response = parseOpenAIResponse(data);
+        const response = await OpenAIStream(comment, API_KEY!);
         Panel.createOrShow(context.extensionUri, response);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);
@@ -80,8 +79,7 @@ export function activate(context: vscode.ExtensionContext) {
           if (askWithCodeSelection) {
             value = `${askWithCodeSelection}\n ${value}:`;
           }
-          const { data } = await OpenAIStream(value, API_KEY!);
-          const response = parseOpenAIResponse(data);
+          const response = await OpenAIStream(value, API_KEY!);
           Panel.createOrShow(context.extensionUri, replaceWithUnicodes(response));
         } catch (err) {
           vscode.window.showErrorMessage((err as Error).message);
@@ -102,8 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       try {
         loaderMessage("Please wait...");
-        const { data } = await OpenAIStream(`${selectedText}. Explain how this code works:`, API_KEY!);
-        const response = parseOpenAIResponse(data);
+        const response = await OpenAIStream(`${selectedText}. Explain how this code works:`, API_KEY!);
         Panel.createOrShow(context.extensionUri, response);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);

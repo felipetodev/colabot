@@ -12,7 +12,3 @@ export function getNonce() {
 export function replaceWithUnicodes(val: string) {
   return val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
-export function parseOpenAIResponse(data: CreateChatCompletionResponse) {
-  return data.choices[0].message?.content!;
-}

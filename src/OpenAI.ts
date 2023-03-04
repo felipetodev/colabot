@@ -18,18 +18,21 @@ const payload = {
 export async function OpenAIStream(selectedText: string, apiKey: string = '') {
   const openai = new OpenAIApi(new Configuration({ apiKey }));
   try {
-    const completion = await openai.createChatCompletion({
+    if (payload.model === 'gpt-3.5-turbo') {
+      const completion = await openai.createChatCompletion({
+        ...payload,
+        messages: [{ role: "user", content: selectedText }],
+      });
+
+      return completion.data.choices[0].message?.content!;
+    }
+
+    const completion = await openai.createCompletion({
+      prompt: selectedText,
       ...payload,
-      messages: [{ role: "user", content: selectedText }],
     });
 
-    // const completion = await openai.createCompletion({
-      //   model: 'text-davinci-003',
-      //   prompt: selectedText,
-      //   ...payload,
-    // });
-
-    return completion;
+    return completion.data.choices[0].text!;
   } catch (error) {
     const errorAsAny = error as any;
     if (errorAsAny.code === 'ENOTFOUND') {
