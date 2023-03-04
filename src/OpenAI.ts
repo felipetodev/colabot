@@ -1,23 +1,26 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { workspace } from 'vscode';
 import { Configuration, OpenAIApi } from 'openai';
 
+const config = workspace.getConfiguration('colaBot');
+
 const payload = {
-  temperature: 0.3,
+  model: config.get('model') as string,
+  temperature: config.get('temperature') as number,
   top_p: 1,
   frequency_penalty: 0,
   presence_penalty: 0,
-  max_tokens: 1500,
+  max_tokens: config.get('maxTokens') as number,
   stream: false,
   n: 1,
 };
 
-export async function OpenAIStream(selectedText: string) {
-  const openai = new OpenAIApi(new Configuration({ apiKey: 'YOUR_API_KEY' }));
+export async function OpenAIStream(selectedText: string, apiKey: string = '') {
+  const openai = new OpenAIApi(new Configuration({ apiKey }));
   try {
     const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: "user", content: selectedText }],
       ...payload,
+      messages: [{ role: "user", content: selectedText }],
     });
 
     // const completion = await openai.createCompletion({

@@ -29,7 +29,7 @@ export class Panel {
     // Otherwise, create a new panel.
     const panel = vscode.window.createWebviewPanel(
       Panel.viewType,
-      'Explain Code GPT',
+      'Explain ColaBOT',
       vscode.ViewColumn.Beside || column,
       {
         // Enable javascript in the webview
