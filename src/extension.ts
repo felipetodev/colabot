@@ -4,10 +4,27 @@ import { OpenAIStream } from './OpenAI';
 import { loaderMessage } from './utils/loaderMessage';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
 import { parseOpenAIResponse, replaceWithUnicodes } from './utils';
+import ApiKeySettings from './apiKeySettings';
 
 export function activate(context: vscode.ExtensionContext) {
+  ApiKeySettings.init(context);
+  const settings = ApiKeySettings.instance;
+
+  vscode.commands.registerCommand("colabot-vscode.setApiKey", async () => {
+    const tokenInput = await vscode.window.showInputBox();
+    if (!tokenInput) {return;}
+    await settings.storeKeyData(tokenInput);
+    vscode.window.showInformationMessage(tokenInput!);
+  });
+
+  vscode.commands.registerCommand("colabot-vscode.removeApiKey", async () => {
+    await settings.deleteKeyData();
+    vscode.window.showInformationMessage("API Key removed");
+  });
+
   context.subscriptions.push(
     vscode.commands.registerCommand('colabot-vscode.getCode', async () => {
+      const API_KEY = await settings.getKeyData();
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         return vscode.window.showErrorMessage("Select code");
@@ -26,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
     
       try {
         loaderMessage("Please wait...");
-        const { data } = await OpenAIStream(comment!);
+        const { data } = await OpenAIStream(comment, API_KEY!);
         const response = parseOpenAIResponse(data);
         Panel.createOrShow(context.extensionUri, response);
       } catch (err) {
@@ -37,6 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('colabot-vscode.askCode', async () => {
+      const API_KEY = await settings.getKeyData();
       const editor = vscode.window.activeTextEditor;
       let askWithCodeSelection = '';
       if (editor) {
@@ -62,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
           if (askWithCodeSelection) {
             value = `${askWithCodeSelection}\n ${value}:`;
           }
-          const { data } = await OpenAIStream(value!);
+          const { data } = await OpenAIStream(value, API_KEY!);
           const response = parseOpenAIResponse(data);
           Panel.createOrShow(context.extensionUri, replaceWithUnicodes(response));
         } catch (err) {
@@ -74,6 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('colabot-vscode.explainCode', async () => {
+      const API_KEY = await settings.getKeyData();
       const editor = vscode.window.activeTextEditor;
       const selection = editor?.selection;
       const selectedText = editor?.document?.getText(selection);
@@ -83,7 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       try {
         loaderMessage("Please wait...");
-        const { data } = await OpenAIStream(`${selectedText}. Explain how this code works:`);
+        const { data } = await OpenAIStream(`${selectedText}. Explain how this code works:`, API_KEY!);
         const response = parseOpenAIResponse(data);
         Panel.createOrShow(context.extensionUri, response);
       } catch (err) {
