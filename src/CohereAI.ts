@@ -1,31 +1,55 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import { workspace } from 'vscode';
 import * as CohereAIApi from 'cohere-ai';
-CohereAIApi.init('YOUR_API_KEY');
 
-const formatType = {
-  paragraph: 'paragraph',
-  bullet: 'bullet',
+const config = workspace.getConfiguration('colaBot');
+
+const payload = {
+  length: 'long',
+  format: 'paragraph',
+  model: config.get('model') as string,
+  temperature: config.get('temperature') as number,
 };
 
-const modelType = {
-  xlarge: 'summarize-xlarge',
-  medium: 'summarize-medium',
-};
+export async function cohereApi(selectedText: string, apiKey: string) {
+  CohereAIApi.init(apiKey);
+  try {
+    if (payload.model === 'command-xlarge-nightly') {
+      const response = await CohereAIApi.generate({
+        prompt: selectedText,
+        model: config.get('model') as string,
+        max_tokens: config.get('maxTokens') as number,
+        temperature: config.get('temperature') as number,
+        k: 0,
+        p: 0.75,
+        stop_sequences: [],
+        return_likelihoods: 'NONE',
+      });
 
-const lengthOptions = {
-  short: 'short',
-  medium: 'medium',
-  long: 'long',
-};
+      if (response.statusCode !== 200) {
+        // @ts-ignore
+        const errMsg = response.body?.message;
+        throw new Error(`Cohere API Error: ${errMsg}`);
+      }
 
-export async function cohereApi(selectedText: string) {
-  const response = await CohereAIApi.summarize({
-    text: `${selectedText} Explain how this code works:`,
-    length: lengthOptions.long,
-    format: formatType.paragraph,
-    model: modelType.xlarge,
-    // additional_command: '',
-    temperature: 0.3,
-  });
-  console.log('Summary:', response.body.summary);
-  return response.body.summary;
+      return response.body.generations[0].text;
+    }
+  
+    const response = await CohereAIApi.summarize({
+      text: selectedText,
+      ...payload
+    });
+
+    if (response.statusCode !== 200) {
+        // @ts-ignore
+        const errMsg = response.body?.message;
+        throw new Error(`Cohere API Error: ${errMsg}`);
+    }
+  
+    return response.body.summary;
+  } catch (err) {
+    const errorAsAny = err as any;
+
+    throw errorAsAny;
+  }
 }
