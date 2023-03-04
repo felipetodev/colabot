@@ -69,7 +69,7 @@
       "properties": {
         "colaBot.apiKey": {
           "type": "string",
-          "description": "To use ColaBOT, you need an API key from OpenAI or Cohere",
+          "description": "To use ColaBOT press (ctrl+shift+p) and search for 'ColaBOT: Set API Key'. then select your AI provider:",
           "default": "openai",
           "enum": [
             "openai",
