@@ -1,15 +1,20 @@
 {
   "name": "colabot-vscode",
-  "displayName": "colabot-vscode",
+  "displayName": "ColaBOT: AI assistant",
   "description": "",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.75.0"
   },
+  "publisher": "ColaBOT",
   "categories": [
     "Other"
   ],
+  "repository": {
+    "url": "https://github.com/felipetodev/colabot"
+  },
   "main": "./out/extension.js",
+  "activationEvents": [],
   "contributes": {
     "menus": {
       "editor/context": [
