@@ -38,6 +38,16 @@
         "category": "ColaBOT"
       },
       {
+        "command": "colabot-vscode.setApiKey",
+        "title": "Set API Key",
+        "category": "ColaBOT"
+      },
+      {
+        "command": "colabot-vscode.removeApiKey",
+        "title": "Remove API Key",
+        "category": "ColaBOT"
+      },
+      {
         "command": "colabot-vscode.askCode",
         "title": "Ask ColaBOT",
         "category": "ColaBOT"
