@@ -84,6 +84,7 @@
           "enum": [
             "gpt-3.5-turbo",
             "text-davinci-003",
+            "command-xlarge-nightly",
             "summarize-xlarge"
           ],
           "order": 2
@@ -126,7 +127,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "cohere-ai": "^5.1.0",
+    "cohere-ai": "^6.0.0",
     "eventsource-parser": "^0.1.0",
     "openai": "^3.2.1"
   }

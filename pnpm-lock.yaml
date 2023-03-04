@@ -8,7 +8,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.49.0
   '@typescript-eslint/parser': ^5.49.0
   '@vscode/test-electron': ^2.2.2
-  cohere-ai: ^5.1.0
+  cohere-ai: ^6.0.0
   eslint: ^8.33.0
   eventsource-parser: ^0.1.0
   glob: ^8.1.0
@@ -18,7 +18,7 @@ specifiers:
   typescript: ^4.9.4
 
 dependencies:
-  cohere-ai: 5.1.0
+  cohere-ai: 6.0.0
   eventsource-parser: 0.1.0
   openai: 3.2.1
 
@@ -431,8 +431,8 @@ packages:
       wrap-ansi: 7.0.0
     dev: true
 
-  /cohere-ai/5.1.0:
-    resolution: {integrity: sha512-7q3z3w6GSoPxQqRL9G6QTaQ0e513auVE1JlNDnqnoFEXGtDbkVfaTOliR5qrMoK//74Csb0NW669evqngwPx3g==}
+  /cohere-ai/6.0.0:
+    resolution: {integrity: sha512-u1KmPw2PWbTQbbZXmdVs610N/zYyh/V6mL/nDXqx1Gl6X7IH84z9gK3jNv/f69Uzc007xe3zHmMYk80WlkHEmA==}
     dev: false
 
   /color-convert/2.0.1:
