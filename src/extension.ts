@@ -80,7 +80,7 @@ export async function activate(context: vscode.ExtensionContext) {
         const selection = editor.selection;
         const selectedText = editor.document.getText(selection);
         // validate selection and selection length
-        if (selectedText && !selectedText.trim() || selectedText.trim().length < 8) {
+        if (selectedText && !selectedText.trim()) {
           return vscode.window.showWarningMessage('Please do a better selection');
         }
         if (selectedText) {
