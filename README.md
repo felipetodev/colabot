@@ -69,7 +69,7 @@ You can configure ColaBOT by going to File > Preferences > Settings, and searchi
 
 This extension is licensed under the [MIT License](LICENSE).
 
-## Insipartion
+## Inspiration
 
 This project was inspired by:
 
