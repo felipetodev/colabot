@@ -1,4 +1,4 @@
-# ColaBOT: AI assistant for VS Code 🤖
+# ColaBOT: AI assistant for VS Code <img width="50" height="50" src="./assets/icon.png" alt="colabot" />
 
 **ColaBOT is an AI assistant** for Visual Studio Code that helps you write code faster and more efficiently. With ColaBOT, you can ask questions about your code, get explanations for complex concepts, and generate code snippets based on your input.
 
