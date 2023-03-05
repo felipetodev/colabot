@@ -63,6 +63,8 @@ You can configure ColaBOT by going to File > Preferences > Settings, and searchi
 - Max Tokens: The maximum number of tokens to generate.
 - Temperature: The temperature of the model (between 0 and 1).
 
+![](./assets/config.gif)
+
 ## License
 
 This extension is licensed under the [MIT License](LICENSE).
