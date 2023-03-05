@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { Panel } from './Panel';
 import { OpenAIStream } from './OpenAI';
 import { cohereApi } from './CohereAI';
-import { loaderMessage } from './utils/loaderMessage';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
 import { replaceWithUnicodes } from './utils';
 import ApiKeySettings from './apiKeySettings';
@@ -10,6 +9,12 @@ import ApiKeySettings from './apiKeySettings';
 const IA_INTELLISENSE = {
   openai: OpenAIStream,
   cohere: cohereApi
+};
+
+const progressOptions: vscode.ProgressOptions = {
+  location: vscode.ProgressLocation.Notification,
+  title: 'ColaBOT',
+  cancellable: true,
 };
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -21,7 +26,11 @@ export async function activate(context: vscode.ExtensionContext) {
   const intellisenseSelected = config.get('apiKey') as keyof typeof IA_INTELLISENSE;
 
   const getApiResponse = async (comment: string) => {
-    return await IA_INTELLISENSE[intellisenseSelected](comment, API_KEY!);
+    return await vscode.window.withProgress(progressOptions, async (progress) => {
+      progress.report({ message: "Loading..." });
+
+      return await IA_INTELLISENSE[intellisenseSelected](comment, API_KEY!);
+    });
   };
 
   vscode.commands.registerCommand("colabot-vscode.setApiKey", async () => {
@@ -55,7 +64,6 @@ export async function activate(context: vscode.ExtensionContext) {
       const comment = `${parseLineComment(currentLine.text, lang)} for ${lang}`;
     
       try {
-        loaderMessage("Please wait...");
         const response = await getApiResponse(comment);
         Panel.createOrShow(context.extensionUri, response);
       } catch (err) {
@@ -87,7 +95,6 @@ export async function activate(context: vscode.ExtensionContext) {
           return vscode.window.showWarningMessage('Please give some more information');
         }
         try {
-          loaderMessage("Please wait...");
           if (askWithCodeSelection) {
             value = `${askWithCodeSelection}\n\n${value}:`;
           }
@@ -110,7 +117,6 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       try {
-        loaderMessage("Please wait...");
         const message = `${selectedText}. Explain how this code works:`;
         const response = await getApiResponse(message);
         Panel.createOrShow(context.extensionUri, response);
