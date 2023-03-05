@@ -28,15 +28,37 @@ To use ColaBOT, you must first set your API key. To do this, press `Ctrl+Shift+P
 
 Once your API key is set, you can use the following commands:
 
-- Ask ColaBOT: Press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Ask ColaBOT". Then, enter your question and press Enter to get an answer.
-- Explain ColaBOT: Press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Explain ColaBOT". Then, enter the concept or term you want to learn about and press Enter to get an explanation.
+## Get Code
+
 - Get Code: Press `Ctrl+Shift+I` to generate code snippets based on your input.
+- Keep your cursor at the end of the same comment line.
+
+![](./assets/getCode.gif)
+
+## Ask Code
+
+- Ask ColaBOT: Press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Ask ColaBOT". Then, enter your question and press Enter to get an answer.
+
+![](./assets/askCode.gif)
+
+
+## Ask Code Selected
+
+- Ask ColaBOT with code selection: With Right click in your selection you are able to ask something with that selection as context.
+
+![](./assets/askCodeSelected.gif)
+
+## Explain Code
+
+- Explain ColaBOT: With Right click in your selection code or Press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Explain ColaBOT". This will return an explanation of what that specific code selection does.
+
+![](./assets/explainCode.gif)
 
 ## Configuration
 
 You can configure ColaBOT by going to File > Preferences > Settings, and searching for "ColaBOT". Here, you can set the following options:
 
-- API Key: Set your API key for ColaBOT.
+- API Key: Set your API key and IA provider for ColaBOT.
 - Model: The model to use for ColaBOT.
 - Max Tokens: The maximum number of tokens to generate.
 - Temperature: The temperature of the model (between 0 and 1).
