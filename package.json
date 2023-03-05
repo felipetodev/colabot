@@ -2,7 +2,7 @@
   "name": "colabot-vscode",
   "displayName": "ColaBOT: AI assistant",
   "description": "Extension that uses AI to help you code faster",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "engines": {
     "vscode": "^1.75.0"
   },
