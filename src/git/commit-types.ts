@@ -1,7 +1,7 @@
 export const COMMIT_TYPES = {
-  ia: {
+  ai: {
     emoji: '🤖',
-    description: 'Submit an IA commit message (ColaBOT)',
+    description: 'Submit an AI commit message (ColaBOT)',
     release: false,
   },
   feat: {

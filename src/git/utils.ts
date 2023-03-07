@@ -2,36 +2,44 @@ import { window } from 'vscode';
 import { gitCommit } from './';
 import { COMMIT_TYPES } from './commit-types';
 
-export function commitTypesOpts(withGitmoji: boolean) {
-  return Object.entries(COMMIT_TYPES).map(([key, val]) =>
-    withGitmoji ? `${val.emoji} ${key}: ${val.description}` : `${key}: ${val.description}`
-  );
+export function commitTypesOpts(withGitmoji: boolean, withSemanticRelease: boolean) {
+  if (withSemanticRelease) {
+    return Object.entries(COMMIT_TYPES).map(([key, val]) =>
+      withGitmoji ? `${val.emoji} ${key}: ${val.description}` : `${key}: ${val.description}`
+    );
+  }
+
+  return [
+    withGitmoji
+      ? `🤖 ai: ${COMMIT_TYPES.ai.description}`
+      : `ai: ${COMMIT_TYPES.ai.description}`,
+  ];
 }
 
 export function getCommitTypeObject({
   type,
-  isIA,
+  isAI,
   withGitmoji,
   commit,
 }: {
   type: string
-  isIA: boolean
+  isAI: boolean
   withGitmoji: boolean
   commit: string
 }) {
   const { emoji, release } = COMMIT_TYPES[type as keyof typeof COMMIT_TYPES];
 
-  if (isIA) {
+  if (isAI) {
     return {
       release,
       commit: `${withGitmoji ? emoji : ''} ${commit.trim()}`,
     };
-  } else {
-    return {
-      release,
-      commit: `${withGitmoji ? emoji : ''} ${type}: ${commit}`,
-    };
   }
+
+  return {
+    release,
+    commit: `${withGitmoji ? emoji : ''} ${type}: ${commit}`,
+  };
 }
 
 const stagedError = 'No staged changes found. Please stage your changes before committing.';
