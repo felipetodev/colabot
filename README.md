@@ -9,6 +9,7 @@
 - Get Code: Generate code snippets based on your input.
 - Set API Key: Set your API key for ColaBOT.
 - Remove API Key: Remove your API key for ColaBOT.
+- Use AI to commit your code.
 
 ## Requirements
 
@@ -54,6 +55,12 @@ Once your API key is set, you can use the following commands:
 
 ![](./assets/explainCode.gif)
 
+## AI Commits (NEW ✨)
+
+- To use AI to commit your code, run the "AI Commit" command (under the "ColaBOT (Git)" category). ColaBOT will generate a commit message using AI, and you can choose whether to use gitmoji and/or semantic versioning in your commit.
+
+![](./assets/aiCommits.gif)
+
 ## Configuration
 
 You can configure ColaBOT by going to File > Preferences > Settings, and searching for "ColaBOT". Here, you can set the following options:
@@ -62,6 +69,8 @@ You can configure ColaBOT by going to File > Preferences > Settings, and searchi
 - Model: The model to use for ColaBOT.
 - Max Tokens: The maximum number of tokens to generate.
 - Temperature: The temperature of the model (between 0 and 1).
+- Git Moji: Whether to use gitmoji in your SemVer commits
+- Semantic Versioning Specification: Whether to use semantic versioning specification in your commits
 
 ![](./assets/config.gif)
 
