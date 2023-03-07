@@ -119,7 +119,7 @@
         },
         "colaBot.gitMoji": {
           "type": "boolean",
-          "description": "Use gitmoji in your commits",
+          "description": "Use gitmoji in your SemVer commits",
           "default": true,
           "order": 5
         },

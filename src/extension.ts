@@ -39,8 +39,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand('colabot-vscode.aiCommit', async () => {
     const withGitmoji = config.get('gitMoji') as boolean;
-    const withSemanticRelease = config.get('semanticVersioningSpecification') as boolean;
-    const commitOptions = commitTypesOpts(withGitmoji, withSemanticRelease);
+    const withSemVer = config.get('semanticVersioningSpecification') as boolean;
+    const commitOptions = commitTypesOpts(withGitmoji, withSemVer);
     try {
       vscode.window
         .showQuickPick(commitOptions, {
@@ -53,7 +53,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
           if (commitType.includes(COMMIT_TYPES.ai.description)) {
             const staged = await getStagedDiff();
-            const promptMessage = await generateCommitMessage(staged.diff, withSemanticRelease);
+            const promptMessage = await generateCommitMessage(staged.diff, withSemVer);
             aiCommitMessage = await getApiResponse(promptMessage);
           }
           vscode.window
@@ -67,7 +67,7 @@ export async function activate(context: vscode.ExtensionContext) {
             .then(async (commitMessage) => {
               if (!commitMessage) {return;}
 
-              if (!withSemanticRelease) {
+              if (!withSemVer) {
                 return await releaseCommit(commitMessage, false);
               }
 

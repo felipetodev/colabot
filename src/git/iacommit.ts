@@ -1,8 +1,8 @@
-const withSemanticVersioning = "(following the Semantic Versioning specification)";
-const promptTemplate = (withSV: boolean) => `Write an insightful but concise Git commit message ${withSV ? withSemanticVersioning : ''} in a complete sentence in present tense for the following diff without prefacing it with anything:`;
+const withSemVer = "(following the Semantic Versioning specification)";
+const promptTemplate = (withSV: boolean) => `Write an insightful but concise Git commit message ${withSV ? withSemVer : ''} in a complete sentence in present tense for the following diff without prefacing it with anything:`;
 
-export async function generateCommitMessage (diff: string, withSemanticVersioning: boolean) {
-  const prompt = `${promptTemplate(withSemanticVersioning)}\n${diff}`;
+export async function generateCommitMessage (diff: string, withSemVer: boolean) {
+  const prompt = `${promptTemplate(withSemVer)}\n${diff}`;
 
   /**
 	 * text-davinci-003 & gpt-3.5-turbo has a token limit of 4000

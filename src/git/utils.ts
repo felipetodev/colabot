@@ -2,8 +2,8 @@ import { window } from 'vscode';
 import { gitCommit } from './';
 import { COMMIT_TYPES } from './commit-types';
 
-export function commitTypesOpts(withGitmoji: boolean, withSemanticRelease: boolean) {
-  if (withSemanticRelease) {
+export function commitTypesOpts(withGitmoji: boolean, withSemVer: boolean) {
+  if (withSemVer) {
     return Object.entries(COMMIT_TYPES).map(([key, val]) =>
       withGitmoji ? `${val.emoji} ${key}: ${val.description}` : `${key}: ${val.description}`
     );
