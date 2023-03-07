@@ -17,6 +17,10 @@
     "Education",
     "Other"
   ],
+  "author": {
+    "name": "Felipe Ossandon",
+    "email": "fe.ossandon.u@gmail.com"
+  },
   "repository": {
     "url": "https://github.com/felipetodev/colabot"
   },
@@ -68,6 +72,11 @@
         "command": "colabot-vscode.explainCode",
         "title": "Explain ColaBOT",
         "category": "ColaBOT"
+      },
+      {
+        "command": "colabot-vscode.aiCommit",
+        "title": "AI Commit",
+        "category": "ColaBOT (Git)"
       }
     ],
     "configuration": {
@@ -107,6 +116,18 @@
           "description": "The temperature of the model (between 0 and 1)",
           "default": 0.3,
           "order": 4
+        },
+        "colaBot.gitMoji": {
+          "type": "boolean",
+          "description": "Use gitmoji in your commits",
+          "default": true,
+          "order": 5
+        },
+        "colaBot.semanticVersioningSpecification": {
+          "type": "boolean",
+          "description": "Use semantic versioning specification in your commits",
+          "default": true,
+          "order": 6
         }
       }
     }
