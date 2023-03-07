@@ -26,7 +26,7 @@ export async function cohereApi(selectedText: string, apiKey: string) {
         return_likelihoods: 'NONE',
       });
 
-      if (response.statusCode !== 200) {
+      if (!response.statusCode || response.statusCode < 200 || response.statusCode > 299) {
         // @ts-ignore
         const errMsg = response.body?.message;
         throw new Error(`Cohere API Error: ${errMsg}`);
