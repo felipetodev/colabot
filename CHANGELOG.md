@@ -1,9 +1,12 @@
-# Change Log
+# Change Log ColaBOT
 
-All notable changes to the "cohere-vscode" extension will be documented in this file.
+All notable changes to the "colabot" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## 1.4.0
 
-## [Unreleased]
+### Minor Changes
 
-- Initial release
+- Add IA commits feature (new ✨)
+- Add IA commits with SemVer Specification (new ✨)
+- Update README.md
+- Fix Set API Key feedback
