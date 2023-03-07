@@ -68,7 +68,7 @@ export async function activate(context: vscode.ExtensionContext) {
               if (!commitMessage) {return;}
 
               if (!withSemanticRelease) {
-                await releaseCommit(commitMessage, false);
+                return await releaseCommit(commitMessage, false);
               }
 
               if (aiCommitMessage) {

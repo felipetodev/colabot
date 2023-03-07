@@ -65,7 +65,7 @@ export async function releaseCommit(commit: string, release: boolean) {
     if (isBreakingChange === 'Yes') {
       try {
         await gitCommit(`${commit} [breaking change]`);
-        return window.showInformationMessage(`Commit created ✔: ${commit} [breaking change] ✔`);
+        return window.showInformationMessage(`Commit created ✔: ${commit} [breaking change]`);
       } catch (err) {
         window.showErrorMessage(stagedError);
         process.exit(0);
@@ -73,5 +73,6 @@ export async function releaseCommit(commit: string, release: boolean) {
     }
   }
 
+  window.showInformationMessage(`Commit created ✔: ${commit}`);
   return await gitCommit(commit);
 }
