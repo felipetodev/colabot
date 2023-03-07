@@ -10,7 +10,7 @@ import { generateCommitMessage } from './git/iacommit';
 import { commitTypesOpts, getCommitTypeObject, releaseCommit } from './git/utils';
 import { COMMIT_TYPES } from './git/commit-types';
 
-const IA_INTELLISENSE = {
+const AI_INTELLISENSE = {
   openai: OpenAIStream,
   cohere: cohereApi,
 };
@@ -27,20 +27,20 @@ export async function activate(context: vscode.ExtensionContext) {
   const API_KEY = await settings.getKeyData();
 
   const config = vscode.workspace.getConfiguration('colaBot');
-  const intellisenseSelected = config.get('apiKey') as keyof typeof IA_INTELLISENSE;
+  const intellisenseSelected = config.get('apiKey') as keyof typeof AI_INTELLISENSE;
 
   const getApiResponse = async (comment: string) => {
     return await vscode.window.withProgress(progressOptions, async (progress) => {
       progress.report({ message: 'Loading...' });
 
-      return await IA_INTELLISENSE[intellisenseSelected](comment, API_KEY!);
+      return await AI_INTELLISENSE[intellisenseSelected](comment, API_KEY!);
     });
   };
 
   vscode.commands.registerCommand('colabot-vscode.aiCommit', async () => {
     const withGitmoji = config.get('gitMoji') as boolean;
     const withSemanticRelease = config.get('semanticVersioningSpecification') as boolean;
-    const commitOptions = commitTypesOpts(withGitmoji);
+    const commitOptions = commitTypesOpts(withGitmoji, withSemanticRelease);
     try {
       vscode.window
         .showQuickPick(commitOptions, {
@@ -49,31 +49,35 @@ export async function activate(context: vscode.ExtensionContext) {
         })
         .then(async (commitType) => {
           if (!commitType) {return;}
-          let iaCommitMessage = '';
+          let aiCommitMessage = '';
 
-          if (commitType.includes(COMMIT_TYPES.ia.description)) {
+          if (commitType.includes(COMMIT_TYPES.ai.description)) {
             const staged = await getStagedDiff();
             const promptMessage = await generateCommitMessage(staged.diff, withSemanticRelease);
-            iaCommitMessage = await getApiResponse(promptMessage);
+            aiCommitMessage = await getApiResponse(promptMessage);
           }
           vscode.window
             .showInputBox({
-              value: iaCommitMessage,
+              value: aiCommitMessage,
               placeHolder: 'Eg: Add new props to the button component',
               prompt: `${
-                iaCommitMessage ? 'Submit/Edit your IA commit message' : 'Write your commit message'
+                aiCommitMessage ? 'Would you like to use this commit message?' : 'Write your commit message'
               }`,
             })
             .then(async (commitMessage) => {
               if (!commitMessage) {return;}
 
-              if (iaCommitMessage) {
-                const type = iaCommitMessage.split(':')[0].trim();
+              if (!withSemanticRelease) {
+                await releaseCommit(commitMessage, false);
+              }
+
+              if (aiCommitMessage) {
+                const type = aiCommitMessage.split(':')[0].trim();
                 const { commit, release } = getCommitTypeObject({
                   type,
-                  isIA: !!iaCommitMessage,
+                  isAI: !!aiCommitMessage,
                   withGitmoji,
-                  commit: iaCommitMessage,
+                  commit: aiCommitMessage,
                 });
 
                 await releaseCommit(commit, release);
@@ -83,7 +87,7 @@ export async function activate(context: vscode.ExtensionContext) {
                   : commitType.split(':')[0];
                 const { commit, release } = getCommitTypeObject({
                   type,
-                  isIA: !!iaCommitMessage,
+                  isAI: !!aiCommitMessage,
                   withGitmoji,
                   commit: commitMessage,
                 });
