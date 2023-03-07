@@ -73,6 +73,11 @@ export async function releaseCommit(commit: string, release: boolean) {
     }
   }
 
-  window.showInformationMessage(`Commit created ✔: ${commit}`);
-  return await gitCommit(commit);
+  try {
+    await gitCommit(commit);
+    return window.showInformationMessage(`Commit created ✔: ${commit}`);
+  } catch (error) {
+    window.showErrorMessage(stagedError);
+    process.exit(0);
+  }
 }
