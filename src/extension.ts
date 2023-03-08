@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { Panel } from './Panel';
+import { Panel } from './panels/Panel';
 import { OpenAIStream } from './OpenAI';
 import { cohereApi } from './CohereAI';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
-import { replaceWithUnicodes } from './utils';
+import { replaceWithUnicodes } from './panels/utils';
 import ApiKeySettings from './apiKeySettings';
 import { getStagedDiff } from './git';
 import { generateCommitMessage } from './git/iacommit';
@@ -54,7 +54,9 @@ export async function activate(context: vscode.ExtensionContext) {
           if (commitType.includes(COMMIT_TYPES.ai.description)) {
             const staged = await getStagedDiff();
             const promptMessage = await generateCommitMessage(staged.diff, withSemVer);
-            aiCommitMessage = await getApiResponse(promptMessage);
+            if (promptMessage) {
+              aiCommitMessage = await getApiResponse(promptMessage); 
+            }
           }
           vscode.window
             .showInputBox({
