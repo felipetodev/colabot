@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Panel } from './panels/Panel';
+import { Panel } from './panels/ReactPanel';
 import { OpenAIStream } from './OpenAI';
 import { cohereApi } from './CohereAI';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
@@ -141,7 +141,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
       try {
         const response = await getApiResponse(comment);
-        Panel.createOrShow(context.extensionUri, response);
+        Panel.render(context.extensionUri, response);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);
       }
@@ -178,7 +178,7 @@ export async function activate(context: vscode.ExtensionContext) {
               value = `${askWithCodeSelection}\n\n${value}:`;
             }
             const response = await getApiResponse(value);
-            Panel.createOrShow(context.extensionUri, replaceWithUnicodes(response));
+            Panel.render(context.extensionUri, replaceWithUnicodes(response));
           } catch (err) {
             vscode.window.showErrorMessage((err as Error).message);
           }
@@ -198,7 +198,7 @@ export async function activate(context: vscode.ExtensionContext) {
       try {
         const message = `${selectedText}. Explain how this code works:`;
         const response = await getApiResponse(message);
-        Panel.createOrShow(context.extensionUri, response);
+        Panel.render(context.extensionUri, response);
       } catch (err) {
         vscode.window.showErrorMessage((err as Error).message);
       }

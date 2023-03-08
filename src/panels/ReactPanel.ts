@@ -1,4 +1,4 @@
-import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn } from "vscode";
+import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn, env } from "vscode";
 import { getUri, getNonce } from "./utils";
 
 /**
@@ -11,9 +11,10 @@ import { getUri, getNonce } from "./utils";
  * - Setting the HTML (and by proxy CSS/JavaScript) content of the webview panel
  * - Setting message listeners so data can be passed between the webview and extension
  */
-export class HelloWorldPanel {
-  public static currentPanel: HelloWorldPanel | undefined;
+export class Panel {
+  public static currentPanel: Panel | undefined;
   private readonly _panel: WebviewPanel;
+  private readonly _selectedText: string;
   private _disposables: Disposable[] = [];
 
   /**
@@ -22,9 +23,9 @@ export class HelloWorldPanel {
    * @param panel A reference to the webview panel
    * @param extensionUri The URI of the directory containing the extension
    */
-  private constructor(panel: WebviewPanel, extensionUri: Uri) {
+  private constructor(panel: WebviewPanel, extensionUri: Uri, selectedText: string) {
     this._panel = panel;
-
+    this._selectedText = selectedText;
     // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
     // the panel or when the panel is closed programmatically)
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -42,19 +43,19 @@ export class HelloWorldPanel {
    *
    * @param extensionUri The URI of the directory containing the extension.
    */
-  public static render(extensionUri: Uri) {
-    if (HelloWorldPanel.currentPanel) {
+  public static render(extensionUri: Uri, selectedText: string) {
+    if (Panel.currentPanel) {
       // If the webview panel already exists reveal it
-      HelloWorldPanel.currentPanel._panel.reveal(ViewColumn.One);
+      Panel.currentPanel._panel.reveal(ViewColumn.One);
     } else {
       // If a webview panel does not already exist create and show a new one
       const panel = window.createWebviewPanel(
         // Panel view type
-        "showHelloWorld",
+        "showExplainPanel",
         // Panel title
-        "Hello World",
+        "Explain ColaBOT",
         // The editor column the panel should be displayed in
-        ViewColumn.One,
+        ViewColumn.Beside,
         // Extra panel configurations
         {
           // Enable JavaScript in the webview
@@ -64,7 +65,7 @@ export class HelloWorldPanel {
         }
       );
 
-      HelloWorldPanel.currentPanel = new HelloWorldPanel(panel, extensionUri);
+      Panel.currentPanel = new Panel(panel, extensionUri, selectedText);
     }
   }
 
@@ -72,7 +73,7 @@ export class HelloWorldPanel {
    * Cleans up and disposes of webview resources when the webview panel is closed.
    */
   public dispose() {
-    HelloWorldPanel.currentPanel = undefined;
+    Panel.currentPanel = undefined;
 
     // Dispose of the current webview panel
     this._panel.dispose();
@@ -114,7 +115,10 @@ export class HelloWorldPanel {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
-          <title>Hello World</title>
+          <title>ColaBOT: AI assistant 🤖</title>
+          <script nonce="${nonce}">
+            window.responseText = ${JSON.stringify(this._selectedText)};
+          </script>
         </head>
         <body>
           <div id="root"></div>
@@ -127,9 +131,6 @@ export class HelloWorldPanel {
   /**
    * Sets up an event listener to listen for messages passed from the webview context and
    * executes code based on the message that is recieved.
-   *
-   * @param webview A reference to the extension webview
-   * @param context A reference to the extension context
    */
   private _setWebviewMessageListener(webview: Webview) {
     webview.onDidReceiveMessage(
@@ -138,12 +139,13 @@ export class HelloWorldPanel {
         const text = message.text;
 
         switch (command) {
-          case "hello":
-            // Code that should run in response to the hello message command
-            window.showInformationMessage(text);
-            return;
-          // Add more switch case statements here as more webview message commands
-          // are created within the webview context (i.e. inside media/main.js)
+          case 'copyToClipboard': {
+            env.clipboard.writeText(text);
+            return window.showInformationMessage("Copy to clipboard ✔");
+          }
+          case 'closeWebviewPanel': {
+            return this.dispose();
+          }
         }
       },
       undefined,
