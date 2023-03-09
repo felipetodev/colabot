@@ -5,7 +5,6 @@ import { cohereApi } from './CohereAI';
 import { languageSupportsComments, parseLineComment } from './consts/comments';
 import { replaceWithUnicodes } from './panels/utils';
 import ApiKeySettings from './apiKeySettings';
-import { getStagedDiff } from './git';
 import { generateCommitMessage } from './git/iacommit';
 import { commitTypesOpts, getCommitTypeObject, releaseCommit } from './git/utils';
 import { COMMIT_TYPES } from './git/commit-types';
@@ -52,8 +51,7 @@ export async function activate(context: vscode.ExtensionContext) {
           let aiCommitMessage = '';
 
           if (commitType.includes(COMMIT_TYPES.ai.description)) {
-            const staged = await getStagedDiff();
-            const promptMessage = await generateCommitMessage(staged.diff, withSemVer);
+            const promptMessage = await generateCommitMessage(withSemVer);
             if (promptMessage) {
               aiCommitMessage = await getApiResponse(promptMessage); 
             }
