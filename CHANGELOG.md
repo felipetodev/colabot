@@ -18,3 +18,9 @@ All notable changes to the "colabot" extension will be documented in this file.
 - Fix ai commits max length token error
 - Add React with TailwindCSS
 - Add Webview Panel with React
+
+## 1.6.0
+
+### Minor Changes
+
+- Fix check for staged changes before generating a commit message
