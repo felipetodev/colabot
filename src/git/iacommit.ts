@@ -1,19 +1,19 @@
-import { window } from 'vscode';
-import { getStagedDiff } from './';
+import { window } from 'vscode'
+import { getStagedDiff } from './'
 
-const withSemVer = '(following the Semantic Versioning specification)';
-const promptTemplate = (withSV: boolean) => `Write an insightful but concise Git commit message ${withSV ? withSemVer : ''} in a complete sentence in present tense for the following diff without prefacing it with anything:`;
+const withSemVer = '(following the Semantic Versioning specification)'
+const promptTemplate = (withSV: boolean) => `Write an insightful but concise Git commit message ${withSV ? withSemVer : ''} in a complete sentence in present tense for the following diff without prefacing it with anything:`
 
-export async function generateCommitMessage(withSemVer: boolean) {
-  const staged = await getStagedDiff();
+export async function generateCommitMessage (withSemVer: boolean) {
+  const staged = await getStagedDiff()
 
   if (staged.files.length === 0) {
-    return window.showWarningMessage(
+    return await window.showWarningMessage(
       'No staged changes found. Please stage your changes before trying to commit.'
-    );
+    )
   }
 
-  const prompt = `${promptTemplate(withSemVer)}\n${staged.diff}`;
+  const prompt = `${promptTemplate(withSemVer)}\n${staged.diff}`
 
   /**
    * text-davinci-003 & gpt-3.5-turbo has a token limit of 4000
@@ -21,10 +21,10 @@ export async function generateCommitMessage(withSemVer: boolean) {
    */
 
   if (prompt.length > 4000) {
-    return window.showWarningMessage(
+    return await window.showWarningMessage(
       'The diff is too large for the OpenAI API. Try reducing the number of staged changes, or write your own commit message.'
-    );
+    )
   }
 
-  return prompt;
+  return prompt
 }

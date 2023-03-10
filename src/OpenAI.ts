@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { workspace } from 'vscode';
-import { Configuration, OpenAIApi } from 'openai';
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+import { workspace } from 'vscode'
+import { Configuration, OpenAIApi } from 'openai'
 
-const config = workspace.getConfiguration('colaBot');
+const config = workspace.getConfiguration('colaBot')
 
 const payload = {
   model: config.get('model') as string,
@@ -12,36 +12,36 @@ const payload = {
   presence_penalty: 0,
   max_tokens: config.get('maxTokens') as number,
   stream: false,
-  n: 1,
-};
+  n: 1
+}
 
-export async function OpenAIStream(selectedText: string, apiKey: string = '') {
-  const openai = new OpenAIApi(new Configuration({ apiKey }));
+export async function OpenAIStream (selectedText: string, apiKey: string = '') {
+  const openai = new OpenAIApi(new Configuration({ apiKey }))
   try {
     if (payload.model === 'gpt-3.5-turbo') {
       const completion = await openai.createChatCompletion({
         ...payload,
-        messages: [{ role: "user", content: selectedText }],
-      });
+        messages: [{ role: 'user', content: selectedText }]
+      })
 
-      return completion.data.choices[0].message?.content!;
+      return completion.data.choices[0].message?.content
     }
 
     const completion = await openai.createCompletion({
       prompt: selectedText,
-      ...payload,
-    });
+      ...payload
+    })
 
-    return completion.data.choices[0].text!;
+    return completion.data.choices[0].text!
   } catch (error) {
-    const errorAsAny = error as any;
+    const errorAsAny = error as any
     if (errorAsAny.code === 'ENOTFOUND') {
       throw new Error(
         `Error connecting to ${errorAsAny.hostname} (${errorAsAny.syscall}). Are you connected to the internet?`
-      );
+      )
     }
 
-    errorAsAny.message = `OpenAI API Error: ${errorAsAny.message} - ${errorAsAny.response.statusText}`;
-    throw errorAsAny;
+    errorAsAny.message = `OpenAI API Error: ${errorAsAny.message} - ${errorAsAny.response.statusText}`
+    throw errorAsAny
   }
 }
