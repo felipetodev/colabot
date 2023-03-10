@@ -68,7 +68,9 @@ export const parseLineComment = (text: string, lang: string) => {
   const singleLineComment = singleLineCommentMap[lang]
   const multiLineComment = multiLineCommentMap[lang]
 
-  if (!singleLineComment && !multiLineComment) { return text }
+  if (!singleLineComment && !multiLineComment) {
+    return text
+  }
 
   if (singleLineComment) {
     return text.replace(singleLineComment, '').trim()

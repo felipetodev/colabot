@@ -47,7 +47,7 @@ export async function activate (context: vscode.ExtensionContext) {
           title: 'ColaBOT: Semantic Commit'
         })
         .then(async (commitType) => {
-          if (!commitType) { return }
+          if (!commitType) return
           let aiCommitMessage = '' as string | undefined
 
           if (commitType.includes(COMMIT_TYPES.ai.description)) {
@@ -65,7 +65,7 @@ export async function activate (context: vscode.ExtensionContext) {
               }`
             })
             .then(async (commitMessage) => {
-              if (!commitMessage) { return }
+              if (!commitMessage) return
 
               if (!withSemVer) {
                 return await releaseCommit(commitMessage, false)
@@ -106,7 +106,7 @@ export async function activate (context: vscode.ExtensionContext) {
     const tokenInput = await vscode.window.showInputBox({
       password: true
     })
-    if (!tokenInput) { return }
+    if (!tokenInput) return
 
     await settings.storeKeyData(tokenInput)
     vscode.window.showInformationMessage(
@@ -166,7 +166,7 @@ export async function activate (context: vscode.ExtensionContext) {
           placeHolder: 'Ask me anything 🤖'
         })
         .then(async (value) => {
-          if (!value) { return }
+          if (!value) return
 
           if (value.trim().length < 8) {
             return await vscode.window.showWarningMessage('Please give some more information')
