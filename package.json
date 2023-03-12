@@ -163,7 +163,6 @@
   },
   "dependencies": {
     "cohere-ai": "^6.0.0",
-    "eventsource-parser": "^0.1.0",
     "openai": "^3.2.1"
   }
 }
