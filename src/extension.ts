@@ -8,6 +8,7 @@ import ApiKeySettings from './apiKeySettings'
 import { generateCommitMessage } from './git/iacommit'
 import { commitTypesOpts, getCommitTypeObject, releaseCommit } from './git/utils'
 import { COMMIT_TYPES } from './git/commit-types'
+import { SidebarProvider } from './panels/SideBar'
 
 const AI_INTELLISENSE = {
   openai: OpenAIStream,
@@ -35,6 +36,14 @@ export async function activate (context: vscode.ExtensionContext) {
       return await AI_INTELLISENSE[intellisenseSelected](comment, API_KEY!)
     })
   }
+
+  const sidebarProvider = new SidebarProvider(context.extensionUri, API_KEY!)
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      'colabot-sidebar',
+      sidebarProvider
+    )
+  )
 
   vscode.commands.registerCommand('colabot-vscode.aiCommit', async () => {
     const withGitmoji = config.get('gitMoji') as boolean
