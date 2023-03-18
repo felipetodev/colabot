@@ -27,6 +27,26 @@
   "main": "./out/extension.js",
   "activationEvents": [],
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "colabot-sidebar-chat",
+          "title": "ColaBOT Chat",
+          "icon": "assets/icon-vector.png"
+        }
+      ]
+    },
+    "views": {
+      "colabot-sidebar-chat": [
+        {
+          "type": "webview",
+          "id": "colabot-sidebar",
+          "name": "",
+          "icon": "assets/icon-vector.png",
+          "contextualTitle": "ColaBOT"
+        }
+      ]
+    },
     "menus": {
       "editor/context": [
         {
