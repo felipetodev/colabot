@@ -4,7 +4,7 @@ import { Configuration, OpenAIApi } from 'openai'
 
 const config = workspace.getConfiguration('colaBot')
 
-const payload = {
+export const openAIPayload = {
   model: config.get('model') as string,
   temperature: config.get('temperature') as number,
   top_p: 1,
@@ -18,9 +18,9 @@ const payload = {
 export async function OpenAIStream (selectedText: string, apiKey: string = '') {
   const openai = new OpenAIApi(new Configuration({ apiKey }))
   try {
-    if (payload.model === 'gpt-3.5-turbo') {
+    if (openAIPayload.model === 'gpt-3.5-turbo') {
       const completion = await openai.createChatCompletion({
-        ...payload,
+        ...openAIPayload,
         messages: [{ role: 'user', content: selectedText }]
       })
 
@@ -29,7 +29,7 @@ export async function OpenAIStream (selectedText: string, apiKey: string = '') {
 
     const completion = await openai.createCompletion({
       prompt: selectedText,
-      ...payload
+      ...openAIPayload
     })
 
     return completion.data.choices[0].text!
