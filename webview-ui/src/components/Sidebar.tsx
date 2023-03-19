@@ -3,8 +3,10 @@ import type { ChatState } from "../types"
 import Loading from "./Loading"
 import SendIcon from "./SendIcon"
 import SidebarCard from "./SidebarCard"
-import { vscode } from "../utils/vscode"
 import { OpenAIStream } from "../utils/openai"
+import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
+import { v4 as uuidv4 } from 'uuid';
+import { vscode } from "../utils/vscode"
 
 const DEFAULT_CHAT_STATE: ChatState = [
   {
@@ -28,26 +30,26 @@ export default function Sidebar() {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    let payload
+    if (window !== undefined) {
+      payload = window.openAIPayload
+    }
+    if (!payload) {
+      vscode.postMessage({
+        command: 'payloadSidebarError',
+        text: 'No payload found',
+      });
+      throw new Error('No payload found')
+    }
+
     e.preventDefault()
     if (!userPrompt) return
     setLoading(true)
     setChatState((prev) => [...prev, { role: 'user', content: userPrompt }])
     setUserPrompt('')
 
-    vscode.postMessage({
-      command: 'sidebarPrompt',
-      text: userPrompt,
-    });
-
     try {
-      let payload
-      if (window !== undefined) {
-        payload = window.openAIPayload
-      }
-      if (!payload) {
-        throw new Error('No payload found')
-      }
-      const content = await OpenAIStream(userPrompt, payload);
+      const content = await OpenAIStream([...chatState, { role: 'user', content: userPrompt }], payload);
       setChatState((prev) => [...prev, { role: 'system', content }])
     } catch (error) {
       console.error(error)
@@ -80,20 +82,25 @@ export default function Sidebar() {
   return (
     <div className="h-screen flex flex-col justify-between pt-4">
       <div>
-        <h1 className='text-blue-400 text-3xl font-bold mb-4'>
-          ColaBOT Chat 🤖
-        </h1>
-        <button className="flex ml-auto" onClick={clearChatContext}>Reset Chat</button>
-        {chatState && chatState.map((chat, idx) => {
-          const { role, content } = chat
-          // TODO: Add uuidv4
-          return (
-            <div key={idx} className='mb-4'>
-              <SidebarCard content={content} type={role} />
-              {chatState.length - 1 === idx && <div className='h-2' />}
-            </div>
-          )
-        })}
+        <div className="flex justify-between items-center mb-4">
+          <h1 className='text-blue-400 text-xl font-bold'>
+            ColaBOT Chat 🤖
+          </h1>
+          <VSCodeButton className="flex ml-auto" onClick={clearChatContext}>
+            Reset Chat
+          </VSCodeButton>
+        </div>
+        {chatState.map(({ role, content }, idx) => (
+          <div key={uuidv4()} className='mb-4'>
+            <SidebarCard content={content} type={role} />
+            {chatState.length - 1 === idx && <div className='h-2' />}
+          </div>
+        ))}
+        {loading && (
+          <div className='-mt-6 px-1'>
+            <Loading />
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className='pb-4'>

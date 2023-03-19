@@ -4,11 +4,16 @@
 //   ReconnectInterval,
 // } from "eventsource-parser";
 
-import type { OpenAIStreamPayload } from "../types";
+import type { ChatState, OpenAIStreamPayload } from "../types";
 
-export async function OpenAIStream (prompt: string, vsCodePayload: OpenAIStreamPayload) {
+export async function OpenAIStream (chatState: ChatState, vsCodePayload: OpenAIStreamPayload) {
   // const encoder = new TextEncoder();
   // const decoder = new TextDecoder();
+
+  chatState.unshift({
+    role: 'system',
+    content: 'You are a very enthusiastic ColaBOT Chat representative who loves to help people!'
+  })
 
   const { apiKey, ...payload } = vsCodePayload;
 
@@ -20,12 +25,20 @@ export async function OpenAIStream (prompt: string, vsCodePayload: OpenAIStreamP
       },
       method: "POST",
       body: JSON.stringify({
-        messages: [{ role: 'user', content: prompt }],
+        messages: chatState,
         ...payload,
       }),
     });
     const completion = await res.json();
     return completion.choices[0].message?.content
+  }
+
+  let prompt = '"[user]:" means that some user is asking you for help\n\n'
+
+  for (const { role, content } of chatState) {
+    role === 'system'
+      ? prompt += `${content}\n`
+      : prompt += `${[role]}: ${content}\n`
   }
 
   const res = await fetch("https://api.openai.com/v1/completions", {

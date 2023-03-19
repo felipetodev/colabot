@@ -1,6 +1,7 @@
-import { type Webview, type WebviewViewProvider, type WebviewView, type TextDocument, type Uri } from 'vscode'
+import { window } from 'vscode'
 import { openAIPayload } from '../OpenAI'
 import { getNonce, getUri } from './utils'
+import type { Webview, WebviewViewProvider, WebviewView, TextDocument, Uri } from 'vscode'
 
 export class SidebarProvider implements WebviewViewProvider {
   _view?: WebviewView
@@ -62,8 +63,8 @@ export class SidebarProvider implements WebviewViewProvider {
         const text = message.text
 
         switch (command) {
-          case 'sidebarPrompt': {
-            console.log(text)
+          case 'payloadSidebarError': {
+            window.showErrorMessage(text)
             break
           }
         }
