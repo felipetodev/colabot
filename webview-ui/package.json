@@ -13,6 +13,7 @@
     "@vscode/webview-ui-toolkit": "^1.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "snarkdown": "2.0.0",
     "uuid": "9.0.0"
   },
   "devDependencies": {
