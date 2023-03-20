@@ -10,6 +10,7 @@
 - Set API Key: Set your API key for ColaBOT.
 - Remove API Key: Remove your API key for ColaBOT.
 - AI Commit: Use AI to commit your code changes.
+- Sidebar chat for interacting with ColaBOT. (NEW ✨)
 
 ## Requirements
 
