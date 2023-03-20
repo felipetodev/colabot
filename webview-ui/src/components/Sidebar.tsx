@@ -106,8 +106,8 @@ export default function Sidebar() {
           </div>
         ))}
         {loading && (
-          <div className='-mt-6 px-1'>
-            <Loading />
+          <div className='-mt-6 px-1 flex items-center text-xs'>
+            <Loading className="mr-2" /> Searching
           </div>
         )}
       </div>

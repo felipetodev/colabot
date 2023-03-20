@@ -6,7 +6,7 @@ const loadingStates = [
   [true, true, true] // ...
 ]
 
-export default function Loading() {
+export default function Loading({ className }: { className?: string }) {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function Loading() {
   }, [index])
 
   return (
-    <div className='flex items-center text-white text-3xl'>
+    <div className={`flex items-center text-white text-3xl ${className}`}>
       <div>·</div>
       <div className={index > 0 ? '' : 'invisible'}>·</div>
       <div className={index === 2 ? '' : 'invisible'}>·</div>
