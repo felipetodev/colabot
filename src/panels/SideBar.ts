@@ -67,6 +67,10 @@ export class SidebarProvider implements WebviewViewProvider {
             window.showErrorMessage(text)
             break
           }
+          case 'apiSidebarError': {
+            window.showErrorMessage(text)
+            break
+          }
         }
       }
     )

@@ -15,9 +15,11 @@ const DEFAULT_CHAT_STATE: ChatState = [
   }
 ]
 
+const STORAGE_KEY = 'chatState'
+
 const getDefaultChatState = () => {
   if (window !== undefined) {
-    const chatState = localStorage.getItem('chatState')
+    const chatState = localStorage.getItem(STORAGE_KEY)
     if (chatState) return JSON.parse(chatState)
     return DEFAULT_CHAT_STATE
   }
@@ -30,16 +32,13 @@ export default function Sidebar() {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    let payload
-    if (window !== undefined) {
-      payload = window.openAIPayload
-    }
+    const payload = window.openAIPayload
     if (!payload) {
       vscode.postMessage({
         command: 'payloadSidebarError',
-        text: 'No payload found',
+        text: 'Something went wrong with the API. No payload found.',
       });
-      throw new Error('No payload found')
+      return
     }
 
     e.preventDefault()
@@ -49,7 +48,22 @@ export default function Sidebar() {
     setUserPrompt('')
 
     try {
-      const content = await OpenAIStream([...chatState, { role: 'user', content: userPrompt }], payload);
+      const content = await OpenAIStream([...chatState, { role: 'user', content: userPrompt }], payload)
+      if (!content) {
+        vscode.postMessage({
+          command: 'apiSidebarError',
+          text: 'Something went wrong with the API. Please try again later.',
+        });
+        return
+      }
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify([
+          ...chatState,
+          { role: 'user', content: userPrompt },
+          { role: 'system', content }
+        ])
+      )
       setChatState((prev) => [...prev, { role: 'system', content }])
     } catch (error) {
       console.error(error)
@@ -69,14 +83,9 @@ export default function Sidebar() {
     setUserPrompt(value)
   }
 
-  useEffect(() => {
-    if (chatState.length <= 1) return
-    localStorage.setItem('chatState', JSON.stringify(chatState))
-  }, [chatState])
-
   const clearChatContext = () => {
     setChatState(DEFAULT_CHAT_STATE)
-    localStorage.removeItem('chatState')
+    localStorage.removeItem(STORAGE_KEY)
   }
 
   return (
@@ -87,7 +96,7 @@ export default function Sidebar() {
             ColaBOT Chat 🤖
           </h1>
           <VSCodeButton className="flex ml-auto" onClick={clearChatContext}>
-            Reset Chat
+            Clear Chat
           </VSCodeButton>
         </div>
         {chatState.map(({ role, content }, idx) => (
