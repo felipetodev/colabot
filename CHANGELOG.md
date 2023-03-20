@@ -24,3 +24,9 @@ All notable changes to the "colabot" extension will be documented in this file.
 ### Minor Changes
 
 - Fix check for staged changes before generating a commit message
+
+## 1.7.0
+
+### Minor Changes
+
+- Add sidebar ColaBOT chat (new ✨)
