@@ -62,6 +62,12 @@ Once your API key is set, you can use the following commands:
 
 ![](./assets/aiCommits.gif)
 
+## Sidebar Chat (NEW ✨)
+
+- ColaBOT Chat tool allows you to quickly resolve any doubts related to programming or other topics while working on your code.
+
+![](./assets/sidebarChat.gif)
+
 ## Configuration
 
 You can configure ColaBOT by going to File > Preferences > Settings, and searching for "ColaBOT". Here, you can set the following options:
