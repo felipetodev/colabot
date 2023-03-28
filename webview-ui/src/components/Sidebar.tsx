@@ -15,18 +15,8 @@ const DEFAULT_CHAT_STATE: ChatState = [
   }
 ]
 
-const STORAGE_KEY = 'chatState'
-
-const getDefaultChatState = () => {
-  if (window !== undefined) {
-    const chatState = localStorage.getItem(STORAGE_KEY)
-    if (chatState) return JSON.parse(chatState)
-    return DEFAULT_CHAT_STATE
-  }
-}
-
 export default function Sidebar() {
-  const [chatState, setChatState] = useState<ChatState>(getDefaultChatState())
+  const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || DEFAULT_CHAT_STATE)
   const [userPrompt, setUserPrompt] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -47,30 +37,44 @@ export default function Sidebar() {
     setChatState((prev) => [...prev, { role: 'user', content: userPrompt }])
     setUserPrompt('')
 
-    try {
-      const content = await OpenAIStream([...chatState, { role: 'user', content: userPrompt }], payload)
-      if (!content) {
-        vscode.postMessage({
-          command: 'apiSidebarError',
-          text: 'Something went wrong with the API. Please try again later.',
-        });
-        return
+    // trigger extension to get selected text from editor
+    vscode.postMessage({
+      command: 'selectedText'
+    });
+
+    // wait for extension to send selected text
+    let selectedText = ''
+    window.addEventListener('message', async (event) => {
+      if (event.data.type === 'selectedText') {
+        selectedText = event.data.text
       }
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify([
+
+      const textContent = selectedText
+        ? `${userPrompt}\n\n${selectedText}`
+        : userPrompt
+
+      try {
+        const content = await OpenAIStream([...chatState, { role: 'user', content: textContent }], payload)
+        if (!content) {
+          vscode.postMessage({
+            command: 'apiSidebarError',
+            text: 'Something went wrong with the API. Please try again later.',
+          });
+          return
+        }
+        vscode.setState([
           ...chatState,
           { role: 'user', content: userPrompt },
           { role: 'system', content }
         ])
-      )
-      setChatState((prev) => [...prev, { role: 'system', content }])
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setUserPrompt('')
-      setLoading(false)
-    }
+        setChatState((prev) => [...prev, { role: 'system', content }])
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setUserPrompt('')
+        setLoading(false)
+      }
+    })
   }
 
   useEffect(() => {
@@ -85,7 +89,7 @@ export default function Sidebar() {
 
   const clearChatContext = () => {
     setChatState(DEFAULT_CHAT_STATE)
-    localStorage.removeItem(STORAGE_KEY)
+    vscode.setState(DEFAULT_CHAT_STATE)
   }
 
   return (
