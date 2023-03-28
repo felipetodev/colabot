@@ -1,13 +1,20 @@
-import { window } from 'vscode'
+import {
+  window,
+  type ExtensionContext,
+  type Webview,
+  type WebviewViewProvider,
+  type WebviewView,
+  type TextDocument,
+  type Uri
+} from 'vscode'
 import { openAIPayload } from '../OpenAI'
 import { getNonce, getUri } from './utils'
-import type { Webview, WebviewViewProvider, WebviewView, TextDocument, Uri } from 'vscode'
 
 export class SidebarProvider implements WebviewViewProvider {
   _view?: WebviewView
   _doc?: TextDocument
   _apiKey: string
-  constructor (private readonly _extensionUri: Uri, apiKey: string) {
+  constructor (private readonly _context: ExtensionContext, apiKey: string) {
     this._apiKey = apiKey
   }
 
@@ -18,19 +25,19 @@ export class SidebarProvider implements WebviewViewProvider {
       // Allow scripts in the webview
       enableScripts: true,
 
-      localResourceRoots: [this._extensionUri]
+      localResourceRoots: [this._context.extensionUri]
     }
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
+    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, this._context.extensionUri)
   }
 
   public revive (panel: WebviewView) {
     this._view = panel
   }
 
-  private _getHtmlForWebview (webview: Webview) {
-    const stylesUri = getUri(webview, this._extensionUri, ['webview-ui', 'build', 'assets', 'index.css'])
-    const scriptUri = getUri(webview, this._extensionUri, ['webview-ui', 'build', 'assets', 'index.js'])
+  private _getHtmlForWebview (webview: Webview, extensionUri: Uri) {
+    const stylesUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'index.css'])
+    const scriptUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'index.js'])
 
     const nonce = getNonce()
 
@@ -61,6 +68,19 @@ export class SidebarProvider implements WebviewViewProvider {
       (message: any) => {
         const command = message.command
         const text = message.text
+
+        const editor = window.activeTextEditor
+        if (editor) {
+          const selection = editor.selection
+          const selectedText = editor.document.getText(selection)
+
+          if (selectedText.length > 0) {
+            this._view?.webview.postMessage({
+              type: 'selectedText',
+              text: selectedText
+            })
+          }
+        }
 
         switch (command) {
           case 'payloadSidebarError': {

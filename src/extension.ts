@@ -37,7 +37,7 @@ export async function activate (context: vscode.ExtensionContext) {
     })
   }
 
-  const sidebarProvider = new SidebarProvider(context.extensionUri, API_KEY!)
+  const sidebarProvider = new SidebarProvider(context, API_KEY!)
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       'colabot-sidebar',
