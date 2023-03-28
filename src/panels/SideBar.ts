@@ -69,19 +69,6 @@ export class SidebarProvider implements WebviewViewProvider {
         const command = message.command
         const text = message.text
 
-        const editor = window.activeTextEditor
-        if (editor) {
-          const selection = editor.selection
-          const selectedText = editor.document.getText(selection)
-
-          if (selectedText.length > 0) {
-            this._view?.webview.postMessage({
-              type: 'selectedText',
-              text: selectedText
-            })
-          }
-        }
-
         switch (command) {
           case 'payloadSidebarError': {
             window.showErrorMessage(text)
@@ -90,6 +77,20 @@ export class SidebarProvider implements WebviewViewProvider {
           case 'apiSidebarError': {
             window.showErrorMessage(text)
             break
+          }
+          case 'selectedText': {
+            const editor = window.activeTextEditor
+            if (editor) {
+              const selection = editor.selection
+              const selectedText = editor.document.getText(selection)
+
+              if (selectedText.length > 0) {
+                this._view?.webview.postMessage({
+                  type: 'selectedText',
+                  text: selectedText
+                })
+              }
+            }
           }
         }
       }

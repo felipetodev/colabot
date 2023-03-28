@@ -18,10 +18,12 @@ const DEFAULT_CHAT_STATE: ChatState = [
 export default function Sidebar() {
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || DEFAULT_CHAT_STATE)
   const [userPrompt, setUserPrompt] = useState<string>('')
+  const [codeSelected, setCodeSelected] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     const payload = window.openAIPayload
     if (!payload) {
       vscode.postMessage({
@@ -31,51 +33,47 @@ export default function Sidebar() {
       return
     }
 
-    e.preventDefault()
     if (!userPrompt) return
+
+    const textContent = codeSelected
+      ? `${userPrompt}\n\n${codeSelected}`
+      : userPrompt
+
     setLoading(true)
     setChatState((prev) => [...prev, { role: 'user', content: userPrompt }])
-    setUserPrompt('')
 
-    // trigger extension to get selected text from editor
-    vscode.postMessage({
-      command: 'selectedText'
-    });
+    try {
+      const content = await OpenAIStream([...chatState, { role: 'user', content: textContent }], payload)
+      if (!content) {
+        vscode.postMessage({
+          command: 'apiSidebarError',
+          text: 'Something went wrong with the API. Please try again later.',
+        });
+        return
+      }
+      vscode.setState([
+        ...chatState,
+        { role: 'user', content: userPrompt },
+        { role: 'system', content }
+      ])
+      setChatState((prev) => [...prev, { role: 'system', content }])
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setUserPrompt('')
+      setCodeSelected('')
+      setLoading(false)
+    }
+  }
 
-    // wait for extension to send selected text
-    let selectedText = ''
+  useEffect(() => {
+    // set up listener for selected text from editor
     window.addEventListener('message', async (event) => {
       if (event.data.type === 'selectedText') {
-        selectedText = event.data.text
-      }
-
-      const textContent = selectedText
-        ? `${userPrompt}\n\n${selectedText}`
-        : userPrompt
-
-      try {
-        const content = await OpenAIStream([...chatState, { role: 'user', content: textContent }], payload)
-        if (!content) {
-          vscode.postMessage({
-            command: 'apiSidebarError',
-            text: 'Something went wrong with the API. Please try again later.',
-          });
-          return
-        }
-        vscode.setState([
-          ...chatState,
-          { role: 'user', content: userPrompt },
-          { role: 'system', content }
-        ])
-        setChatState((prev) => [...prev, { role: 'system', content }])
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setUserPrompt('')
-        setLoading(false)
+        setCodeSelected(event.data.text)
       }
     })
-  }
+  }, [])
 
   useEffect(() => {
     if (!inputRef.current) return
@@ -83,8 +81,10 @@ export default function Sidebar() {
   }, [])
 
   const handlePrompt = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target
-    setUserPrompt(value)
+    vscode.postMessage({
+      command: 'selectedText'
+    });
+    setUserPrompt(e.target.value)
   }
 
   const clearChatContext = () => {
