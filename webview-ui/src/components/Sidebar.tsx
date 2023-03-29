@@ -1,22 +1,16 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react"
+import { ChangeEvent, FormEvent, useEffect, useRef, useState, Fragment } from "react"
 import type { ChatState } from "../types"
+import Header from "./Header"
 import Loading from "./Loading"
 import SendIcon from "./SendIcon"
 import SidebarCard from "./SidebarCard"
 import { OpenAIStream } from "../utils/openai"
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 import { v4 as uuidv4 } from 'uuid';
 import { vscode } from "../utils/vscode"
-
-const DEFAULT_CHAT_STATE: ChatState = [
-  {
-    role: 'system',
-    content: 'Hi, I am ColaBOT, how can I help you?'
-  }
-]
+import { VSCodeDivider } from "@vscode/webview-ui-toolkit/react"
 
 export default function Sidebar() {
-  const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || DEFAULT_CHAT_STATE)
+  const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
   const [userPrompt, setUserPrompt] = useState<string>('')
   const [codeSelected, setCodeSelected] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
@@ -87,27 +81,27 @@ export default function Sidebar() {
     setUserPrompt(e.target.value)
   }
 
-  const clearChatContext = () => {
-    setChatState(DEFAULT_CHAT_STATE)
-    vscode.setState(DEFAULT_CHAT_STATE)
-  }
-
   return (
     <div className="h-screen flex flex-col justify-between pt-4">
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h1 className='text-blue-400 text-xl font-bold'>
-            ColaBOT Chat 🤖
-          </h1>
-          <VSCodeButton className="flex ml-auto" onClick={clearChatContext}>
-            Clear Chat
-          </VSCodeButton>
-        </div>
+        <Header
+          chatState={chatState}
+          codeSelected={codeSelected}
+          setChatState={setChatState}
+          setLoading={setLoading}
+          setCodeSelected={setCodeSelected}
+        />
+
+        <VSCodeDivider className="block m-0 mt-5 bg-gray-500/10 h-0.5" role="separator" />
+
         {chatState.map(({ role, content }, idx) => (
-          <div key={uuidv4()} className='mb-4'>
-            <SidebarCard content={content} type={role} />
-            {chatState.length - 1 === idx && <div className='h-2' />}
-          </div>
+          <Fragment key={uuidv4()}>
+            <div className={`py-4 ${role === 'user' ? '' : 'bg-[var(--vscode-editor-background)]'}`}>
+              <SidebarCard content={content} type={role} />
+            </div>
+            <VSCodeDivider className="block m-0 bg-gray-500/10 h-0.5" role="separator" />
+            {chatState.length - 1 === idx && <div className='mb-5' />}
+          </Fragment>
         ))}
         {loading && (
           <div className='-mt-6 px-1 flex items-center text-xs'>
@@ -116,7 +110,7 @@ export default function Sidebar() {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className='pb-4'>
+      <form onSubmit={handleSubmit} className='pb-4 mx-4'>
         <div className='relative block'>
           <input
             ref={inputRef}
