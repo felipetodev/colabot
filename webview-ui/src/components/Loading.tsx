@@ -18,7 +18,7 @@ export default function Loading({ className }: { className?: string }) {
   }, [index])
 
   return (
-    <div className={`flex items-center text-white text-3xl ${className}`}>
+    <div className={`flex items-center text-3xl ${className}`}>
       <div>·</div>
       <div className={index > 0 ? '' : 'invisible'}>·</div>
       <div className={index === 2 ? '' : 'invisible'}>·</div>
