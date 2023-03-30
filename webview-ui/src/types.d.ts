@@ -3,12 +3,14 @@ declare global {
     responseText?: string;
     sidebar?: boolean;
     openAIPayload?: OpenAIStreamPayload;
+    currentTheme?: string;
   }
 }
 
 export type ChatState = Array<{
   role: 'user' | 'system'
-  content: string
+  content: string,
+  language?: string | undefined,
 }>
 
 export type OpenAIStreamPayload = {

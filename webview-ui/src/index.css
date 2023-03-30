@@ -5,3 +5,8 @@
 body {
   padding: 0 !important;
 }
+
+vscode-text-field::part(root) {
+  height: 50px !important;
+  border-radius: 0.230rem;
+}
