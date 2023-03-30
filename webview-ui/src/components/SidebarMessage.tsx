@@ -1,12 +1,25 @@
+import CodeBlock from './CodeBlock';
 import ReactMarkdown from 'react-markdown'
-import { ChatState } from '../types';
+import remarkGfm from 'remark-gfm';
+import { v4 as uuidv4 } from 'uuid';
+
+import type { ChatState } from '../types';
 
 type Props = {
   content: ChatState[0]['content'];
   type: ChatState[0]['role'];
+  language: string;
 }
 
-export default function SidebarCard({ content, type }: Props) {
+export default function SideMessage({ content, type, language }: Props) {
+  // ✨ TODO:
+  // const [theme] = useState(() => {
+  //   if (typeof window !== 'undefined') {
+  //     return window.currentTheme! ?? ''
+  //   }
+  //   return ''
+  // })
+
   return (
     <div className='mx-4 flex flex-col justify-center'>
       {type === 'user' ? (
@@ -31,10 +44,25 @@ export default function SidebarCard({ content, type }: Props) {
       <div className='flex-1 items-center whitespace-pre-wrap overflow-x-auto'>
         <div className='w-full break-words prose-invert'>
           <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
-              pre: ({ node, ...props }) => (
-                <pre className='p-1 bg-[var(--vscode-sideBar-background)] overflow-x-scroll' {...props} />
-              )
+              code: ({ node, inline, className, children, ...props }) => {
+                const match = /language-(\w+)/.exec(className || '')
+
+                return !inline && (match || language) ? (
+                  <CodeBlock
+                    key={uuidv4()}
+                    // style={theme}
+                    language={match?.[1] ?? language}
+                    value={String(children).replace(/\n$/, '')}
+                    {...props}
+                  />
+                ) : (
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
+                )
+              }
             }}
           >
             {content}
