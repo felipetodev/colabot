@@ -1,5 +1,7 @@
 import {
+  env,
   window,
+  workspace,
   type ExtensionContext,
   type Webview,
   type WebviewViewProvider,
@@ -41,6 +43,9 @@ export class SidebarProvider implements WebviewViewProvider {
 
     const nonce = getNonce()
 
+    const config = workspace.getConfiguration()
+    const currentTheme = config.get('workbench.colorTheme')
+
     return /* html */ `
       <!DOCTYPE html>
       <html lang="en">
@@ -53,6 +58,7 @@ export class SidebarProvider implements WebviewViewProvider {
           <script nonce="${nonce}">
             window.sidebar = ${JSON.stringify(true)};
             window.openAIPayload = ${JSON.stringify({ ...openAIPayload, apiKey: this._apiKey })};
+            window.currentTheme = ${JSON.stringify(currentTheme)};
           </script>
         </head>
         <body>
@@ -82,15 +88,23 @@ export class SidebarProvider implements WebviewViewProvider {
             const editor = window.activeTextEditor
             if (editor) {
               const selection = editor.selection
-              const selectedText = editor.document.getText(selection)
+              const selectedText = editor.document.getText(selection).trim()
 
               if (selectedText.length > 0) {
                 this._view?.webview.postMessage({
                   type: 'selectedText',
-                  text: selectedText
+                  editor: {
+                    selectedText,
+                    language: editor.document.languageId
+                  }
                 })
               }
             }
+            break
+          }
+          case 'copyToClipboard': {
+            env.clipboard.writeText(text)
+            break
           }
         }
       }
