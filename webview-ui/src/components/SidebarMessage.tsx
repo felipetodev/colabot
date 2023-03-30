@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm';
 import { v4 as uuidv4 } from 'uuid';
 
-import type { ChatState } from '../types';
+import type { ChatState } from '../types.d';
 
 type Props = {
   content: ChatState[0]['content'];

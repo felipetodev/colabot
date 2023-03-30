@@ -24,3 +24,16 @@ export type OpenAIStreamPayload = {
   n: number;
   apiKey: string;
 }
+
+export type Editor = {
+  selectedText: string
+  language: string
+} | null
+
+export enum VSCodeMessageTypes {
+  CopyToClipboard = 'copyToClipboard',
+  SelectedText = 'selectedText',
+  PayloadSidebarError = 'payloadSidebarError',
+  ApiSidebarError = 'apiSidebarError',
+  CloseWebviewPanel = 'closeWebviewPanel',
+}

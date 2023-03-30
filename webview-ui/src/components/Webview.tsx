@@ -1,11 +1,12 @@
 import { VSCodeButton } from '@vscode/webview-ui-toolkit/react';
+import { VSCodeMessageTypes } from '../types.d';
 import { vscode } from '../utils/vscode';
 import Clipboard from './Clipboard';
 
 export default function CommandsWebview({ response }: { response: string }) {
   const handleCloseWebviewPanel = () => {
     vscode.postMessage({
-      command: 'closeWebviewPanel',
+      command: VSCodeMessageTypes.CloseWebviewPanel,
     });
   }
   return (

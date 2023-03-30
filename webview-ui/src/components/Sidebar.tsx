@@ -8,12 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { vscode } from "../utils/vscode"
 import { VSCodeButton, VSCodeDivider, VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
 
-import type { ChatState } from "../types"
-
-type Editor = {
-  selectedText: string
-  language: string
-} | null
+import { type ChatState, type Editor, VSCodeMessageTypes } from "../types.d"
 
 export default function Sidebar() {
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
@@ -28,7 +23,7 @@ export default function Sidebar() {
     const payload = window.openAIPayload
     if (!payload) {
       vscode.postMessage({
-        command: 'payloadSidebarError',
+        command: VSCodeMessageTypes.PayloadSidebarError,
         text: 'Something went wrong with the API. No payload found.',
       });
       return
@@ -50,7 +45,7 @@ export default function Sidebar() {
       )
       if (!content) {
         vscode.postMessage({
-          command: 'apiSidebarError',
+          command: VSCodeMessageTypes.ApiSidebarError,
           text: 'Something went wrong with the API. Please try again later.',
         });
         return
@@ -73,8 +68,9 @@ export default function Sidebar() {
   useEffect(() => {
     // set up listener for selected text from editor
     window.addEventListener('message', async (event) => {
-      if (event.data.type === 'selectedText') {
-        setEditor(event.data.editor)
+      const { type, editor } = event.data as { type: 'selectedText', editor: Editor }
+      if (type === 'selectedText') {
+        setEditor(editor)
       }
     })
   }, [])
@@ -86,7 +82,7 @@ export default function Sidebar() {
 
   const handlePrompt = (value: string) => {
     vscode.postMessage({
-      command: 'selectedText'
+      command: VSCodeMessageTypes.SelectedText
     });
     setUserPrompt(value)
   }
@@ -113,7 +109,7 @@ export default function Sidebar() {
           editor={editor}
           setChatState={setChatState}
           setLoading={setLoading}
-          setEditor={setEditor}
+          setEditor={() => setEditor(null)}
         />
 
         <VSCodeDivider className="block m-0 mt-5 bg-gray-500/10 h-0.5" role="separator" />

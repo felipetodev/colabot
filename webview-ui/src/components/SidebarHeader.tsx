@@ -1,13 +1,13 @@
 import { vscode } from "../utils/vscode"
 import { VSCodeLink } from "@vscode/webview-ui-toolkit/react"
 import { OpenAIStream } from "../utils/openai"
-import type { ChatState } from "../types"
+import { type ChatState, type Editor, VSCodeMessageTypes } from "../types.d"
 
 type Props = {
   chatState: ChatState
   setChatState: React.Dispatch<React.SetStateAction<ChatState>>
-  editor: { selectedText: string, language: string } | null
-  setEditor: (codeSelected: { selectedText: string, language: string } | null) => void
+  editor: Editor
+  setEditor: (editor: Editor) => void
   setLoading: (loading: boolean) => void
 }
 
@@ -18,7 +18,7 @@ export default function SidebarHeader({
   setEditor,
   setLoading
 }: Props) {
-  const handleShortcut = async (shortcut: string) => {
+  const handleShortcut = async (shortcut: 'EXPLAIN' | 'FIX' | 'TEST') => {
     if (!editor?.selectedText) return
 
     setLoading(true)
@@ -39,7 +39,7 @@ export default function SidebarHeader({
       )
       if (!content) {
         vscode.postMessage({
-          command: 'apiSidebarError',
+          command: VSCodeMessageTypes.ApiSidebarError,
           text: 'Something went wrong with the API. Please try again later.',
         });
         return
@@ -59,7 +59,7 @@ export default function SidebarHeader({
 
   const getSelectedText = () => {
     vscode.postMessage({
-      command: 'selectedText'
+      command: VSCodeMessageTypes.SelectedText
     });
   }
 

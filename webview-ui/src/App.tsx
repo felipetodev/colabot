@@ -5,12 +5,12 @@ import CommandsWebview from './components/Webview';
 
 function App() {
   const [aiResponse] = useState<string | undefined>(() => {
-    if (window !== undefined) {
+    if (typeof window !== 'undefined') {
       return window?.responseText;
     }
   })
   const [sidebar] = useState<boolean>(() => {
-    if (window !== undefined) {
+    if (typeof window !== 'undefined') {
       return window?.sidebar ?? false;
     }
     return false
