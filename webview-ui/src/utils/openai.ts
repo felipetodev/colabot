@@ -4,9 +4,16 @@ export async function OpenAIStream (chatState: ChatState, vsCodePayload: OpenAIS
   // const encoder = new TextEncoder();
   // const decoder = new TextDecoder();
 
-  chatState.unshift({
+  const cleanedChatState = chatState.map(({ role, content }) => {
+    return {
+      role,
+      content
+    }
+  })
+
+  cleanedChatState.unshift({
     role: 'system',
-    content: 'You are a very enthusiastic ColaBOT Chat representative who loves to help people!'
+    content: 'You are a very enthusiastic ColaBOT Chat representative who loves to help people. Follow the user\'s instructions carefully. Respond using markdown.'
   })
 
   const { apiKey, ...payload } = vsCodePayload;
@@ -20,7 +27,7 @@ export async function OpenAIStream (chatState: ChatState, vsCodePayload: OpenAIS
         },
         method: "POST",
         body: JSON.stringify({
-          messages: chatState,
+          messages: cleanedChatState,
           ...payload,
         }),
       });
@@ -39,7 +46,7 @@ export async function OpenAIStream (chatState: ChatState, vsCodePayload: OpenAIS
 
   let prompt = '"[user]:" means that some user is asking you for help\n\n'
 
-  for (const { role, content } of chatState) {
+  for (const { role, content } of cleanedChatState) {
     role === 'system'
       ? prompt += `${content}\n`
       : prompt += `${[role]}: ${content}\n`
