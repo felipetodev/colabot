@@ -118,14 +118,24 @@ export async function activate (context: vscode.ExtensionContext) {
     if (!tokenInput) return
 
     await settings.storeKeyData(tokenInput)
-    vscode.window.showInformationMessage(
-      `API Key set and saved: ${tokenInput.split('', 8).join('')}XXXX ✔`
-    )
+    const action = 'Reload'
+    const msgReload = 'API key set ✔. Please reload to apply changes.'
+    vscode.window.showInformationMessage(msgReload, action).then((selectedAction) => {
+      if (selectedAction === action) {
+        vscode.commands.executeCommand('workbench.action.reloadWindow')
+      }
+    })
   })
 
   vscode.commands.registerCommand('colabot-vscode.removeApiKey', async () => {
     await settings.deleteKeyData()
-    vscode.window.showInformationMessage('API Key removed')
+    const action = 'Reload'
+    const msgReload = 'API key removed. Please reload to apply changes.'
+    vscode.window.showInformationMessage(msgReload, action).then((selectedAction) => {
+      if (selectedAction === action) {
+        vscode.commands.executeCommand('workbench.action.reloadWindow')
+      }
+    })
   })
 
   context.subscriptions.push(
