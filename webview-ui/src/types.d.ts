@@ -36,4 +36,5 @@ export enum VSCodeMessageTypes {
   PayloadSidebarError = 'payloadSidebarError',
   ApiSidebarError = 'apiSidebarError',
   CloseWebviewPanel = 'closeWebviewPanel',
+  ReplaceSelectedCode = 'replaceSelectedCode',
 }
