@@ -48,7 +48,7 @@ class VSCodeAPIWrapper {
     if (this.vsCodeApi) {
       return this.vsCodeApi.getState();
     } else {
-      const state = localStorage.getItem("vscodeState");
+      const state = localStorage.getItem("chatState");
       return state ? JSON.parse(state) : undefined;
     }
   }
@@ -68,7 +68,7 @@ class VSCodeAPIWrapper {
     if (this.vsCodeApi) {
       return this.vsCodeApi.setState(newState);
     } else {
-      localStorage.setItem("vscodeState", JSON.stringify(newState));
+      localStorage.setItem("chatState", JSON.stringify(newState));
       return newState;
     }
   }
