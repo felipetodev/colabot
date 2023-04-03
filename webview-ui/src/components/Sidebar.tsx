@@ -119,7 +119,7 @@ export default function Sidebar() {
             <div className={`py-4 ${role === 'user' ? '' : 'bg-[var(--vscode-editor-background)]'}`}>
               <SidebarMessage
                 content={content}
-                type={role}
+                role={role}
                 language={language}
               />
             </div>

@@ -7,11 +7,13 @@ declare global {
   }
 }
 
-export type ChatState = Array<{
-  role: 'user' | 'system'
+export type Message = {
+  role: 'user' | 'system',
   content: string,
   language?: string | undefined,
-}>
+}
+
+export type ChatState = Array<Message>
 
 export type OpenAIStreamPayload = {
   model: 'text-davinci-003' | 'gpt-3.5-turbo' | string;
