@@ -11,6 +11,8 @@ import {
 } from 'vscode'
 import { openAIPayload } from '../OpenAI'
 import { getNonce, getUri } from './utils'
+import { Credentials } from '../authentication'
+import { Util } from '../Util'
 
 export class SidebarProvider implements WebviewViewProvider {
   _view?: WebviewView
@@ -52,13 +54,14 @@ export class SidebarProvider implements WebviewViewProvider {
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="default-src https://api.openai.com/v1/completions https://api.openai.com/v1/chat/completions; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+          <meta http-equiv="Content-Security-Policy" content="default-src https://api.openai.com/v1/completions https://api.openai.com/v1/chat/completions; img-src https: data:; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
           <title>ColaBOT: AI assistant 🤖</title>
           <script nonce="${nonce}">
             window.sidebar = ${JSON.stringify(true)};
             window.openAIPayload = ${JSON.stringify({ ...openAIPayload, apiKey: this._apiKey })};
             window.currentTheme = ${JSON.stringify(currentTheme)};
+            window.accessToken = ${JSON.stringify(Util.getAccessToken())};
           </script>
         </head>
         <body>
@@ -69,9 +72,11 @@ export class SidebarProvider implements WebviewViewProvider {
     `
   }
 
-  private _setWebviewMessageListener (webview: Webview) {
+  private async _setWebviewMessageListener (webview: Webview) {
+    const credentials = new Credentials()
+    await credentials.initialize(this._context)
     webview.onDidReceiveMessage(
-      (message: any) => {
+      async (message: any) => {
         const command = message.command
         const text = message.text
 
@@ -114,6 +119,18 @@ export class SidebarProvider implements WebviewViewProvider {
           }
           case 'copyToClipboard': {
             env.clipboard.writeText(text)
+            break
+          }
+          case 'signIn': {
+            const octokit = await credentials.getOctokit()
+            const { data } = await octokit.users.getAuthenticated()
+            if (data) {
+              this._view?.webview.postMessage({
+                type: 'signInData',
+                user: data
+              })
+              window.showInformationMessage(`Logged into GitHub as ${data.login}`)
+            }
             break
           }
         }

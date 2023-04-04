@@ -9,6 +9,7 @@ import { generateCommitMessage } from './git/iacommit'
 import { commitTypesOpts, getCommitTypeObject, releaseCommit } from './git/utils'
 import { COMMIT_TYPES } from './git/commit-types'
 import { SidebarProvider } from './panels/SideBar'
+import { Util } from './Util'
 
 const AI_INTELLISENSE = {
   openai: OpenAIStream,
@@ -22,6 +23,7 @@ const progressOptions: vscode.ProgressOptions = {
 }
 
 export async function activate (context: vscode.ExtensionContext) {
+  Util.globalState = context.globalState
   ApiKeySettings.init(context)
   const settings = ApiKeySettings.instance
   const API_KEY = await settings.getKeyData()
