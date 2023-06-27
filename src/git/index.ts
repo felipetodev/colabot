@@ -43,3 +43,22 @@ export async function gitCommit (commit: string) {
   const { stdout } = await exec(`git commit -m "${commit}"`, { cwd: getWorkspaceFolder() })
   return cleanStdout(stdout)
 }
+
+export async function gitPush ({ head }: { head: string }) {
+  const { stdout } = await exec(`git push origin ${head}`, { cwd: getWorkspaceFolder() })
+  return cleanStdout(stdout)
+}
+
+export async function gitRemoteOrigin () {
+  const { stdout } = await exec('git remote get-url origin', { cwd: getWorkspaceFolder() })
+  // return owner and repo
+  return {
+    owner: stdout.split('/').at(-2).replaceAll('\n', '').trim(),
+    repo: stdout.split('/').at(-1).replace('.git', '').replaceAll('\n', '').trim()
+  }
+}
+
+export async function gitCreateBranch ({ branch }: { branch: string }) {
+  const { stdout } = await exec(`git switch -c ${branch}`, { cwd: getWorkspaceFolder() })
+  return cleanStdout(stdout)
+}

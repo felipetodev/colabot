@@ -28,3 +28,15 @@ export async function generateCommitMessage (withSemVer: boolean) {
 
   return prompt
 }
+
+export async function generateBodyMessage () {
+  const staged = await getStagedDiff()
+
+  if (staged.files.length === 0) {
+    return await window.showWarningMessage(
+      'No staged changes found. Please stage your changes before trying to commit.'
+    )
+  }
+
+  return `Write an insightful but concise Git commit body message for the following diff. answer using only that information, outputted in markdown format:\n${staged.diff}`
+}
