@@ -3,10 +3,10 @@ import SidebarHeader from "./SidebarHeader"
 import Loading from "./Loading"
 import SendIcon from "./SendIcon"
 import SidebarMessage from "./SidebarMessage"
-import { OpenAIStream } from "../utils/openai"
 import { v4 as uuidv4 } from 'uuid';
 import { vscode } from "../utils/vscode"
 import { VSCodeButton, VSCodeDivider, VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
+import { LangChainStream } from "../utils/opaneai-chain"
 
 import { type ChatState, type Editor, VSCodeMessageTypes } from "../types.d"
 
@@ -31,31 +31,57 @@ export default function Sidebar() {
 
     if (!userPrompt) return
 
-    const textContent = editor?.selectedText
+    const message = editor?.selectedText
       ? `${userPrompt}\n\n${editor.selectedText}`
       : userPrompt
 
     setLoading(true)
     setChatState((prev) => [...prev, { role: 'user', content: userPrompt }])
 
+    let chatUpdate: ChatState = [...chatState, { role: 'user', content: message }]
+
+    let text = ''
+    let isFirst = true
     try {
-      const content = await OpenAIStream(
-        [...chatState, { role: 'user', content: textContent }],
-        payload
+      await LangChainStream(
+        chatUpdate,
+        payload,
+        ({ message }: { message: string }) => {
+          if (message === '[DONE]' || message === '[ERROR]') {
+            setUserPrompt('')
+            setEditor(null)
+            setLoading(false)
+            return
+          }
+          text += message
+
+          if (isFirst) {
+            isFirst = false
+            chatUpdate = [...chatUpdate, { role: 'system', content: '' }]
+          }
+
+          chatUpdate = chatUpdate.map(
+            (chat, index) => {
+              if (index === chatUpdate.length - 1) {
+                return {
+                  ...chat,
+                  role: 'system',
+                  content: text
+                }
+              }
+              return chat
+            }
+          )
+
+          setChatState(chatUpdate)
+        }
       )
-      if (!content) {
-        vscode.postMessage({
-          command: VSCodeMessageTypes.ApiSidebarError,
-          text: 'Something went wrong with the API. Please try again later.',
-        });
-        return
-      }
+
       vscode.setState([
         ...chatState,
         { role: 'user', content: userPrompt },
-        { role: 'system', content, language: editor?.language }
+        { role: 'system', content: text, language: editor?.language }
       ])
-      setChatState((prev) => [...prev, { role: 'system', content, language: editor?.language }])
     } catch (error) {
       console.error(error)
     } finally {
