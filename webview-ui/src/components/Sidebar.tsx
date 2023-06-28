@@ -118,6 +118,83 @@ export default function Sidebar() {
     vscode.setState([])
   }
 
+  const handleUpdateConversation = async (type: 'EXPLAIN' | 'FIX' | 'TEST') => {
+    if (!editor?.selectedText) return
+
+    setLoading(true)
+    let prompt = ''
+    if (type === 'EXPLAIN') {
+      prompt = `Explain this code:\n
+\`\`\`${editor.language}
+${editor.selectedText}
+\`\`\``
+    }
+    if (type === 'FIX') {
+      prompt = `Fix this code:\n
+\`\`\`${editor.language}
+${editor.selectedText}
+\`\`\``
+    }
+    if (type === 'TEST') {
+      prompt = `Test this code:\n
+\`\`\`${editor.language}
+${editor.selectedText}
+\`\`\``
+    }
+
+    let chatUpdate: ChatState = [...chatState, { role: 'user', content: prompt }]
+    setChatState(chatUpdate)
+
+    let text = ''
+    let isFirst = true
+    try {
+      await LangChainStream(
+        chatUpdate,
+        window.openAIPayload!,
+        ({ message }: { message: string }) => {
+          if (message === '[DONE]' || message === '[ERROR]') {
+            setUserPrompt('')
+            setEditor(null)
+            setLoading(false)
+            return
+          }
+          text += message
+
+          if (isFirst) {
+            isFirst = false
+            chatUpdate = [...chatUpdate, { role: 'system', content: '' }]
+          }
+
+          chatUpdate = chatUpdate.map(
+            (chat, index) => {
+              if (index === chatUpdate.length - 1) {
+                return {
+                  ...chat,
+                  role: 'system',
+                  content: text
+                }
+              }
+              return chat
+            }
+          )
+
+          setChatState(chatUpdate)
+        }
+      )
+
+      vscode.setState([
+        ...chatState,
+        { role: 'user', content: prompt },
+        { role: 'system', content: text, language: editor?.language }
+      ])
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setEditor(null)
+      setLoading(false)
+    }
+  }
+
   return (
     <div ref={containerRef} className="h-full min-h-screen flex flex-col pt-4">
       <div className="px-4 bg-[var(--vscode-sideBar-background)] sticky top-0 z-10 flex justify-between items-center pb-4">
@@ -131,11 +208,7 @@ export default function Sidebar() {
       </div>
       <div>
         <SidebarHeader
-          chatState={chatState}
-          editor={editor}
-          setChatState={setChatState}
-          setLoading={setLoading}
-          setEditor={() => setEditor(null)}
+          onUpdateConversation={handleUpdateConversation}
         />
 
         <VSCodeDivider className="block m-0 mt-5 bg-gray-500/10 h-0.5" role="separator" />

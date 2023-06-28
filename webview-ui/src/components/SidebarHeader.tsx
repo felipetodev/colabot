@@ -1,62 +1,14 @@
 import { vscode } from "../utils/vscode"
 import { VSCodeLink } from "@vscode/webview-ui-toolkit/react"
-import { OpenAIStream } from "../utils/openai"
-import { type ChatState, type Editor, VSCodeMessageTypes } from "../types.d"
+import { VSCodeMessageTypes } from "../types.d"
 
 type Props = {
-  chatState: ChatState
-  setChatState: React.Dispatch<React.SetStateAction<ChatState>>
-  editor: Editor
-  setEditor: (editor: Editor) => void
-  setLoading: (loading: boolean) => void
+  onUpdateConversation: (type: 'EXPLAIN' | 'FIX' | 'TEST') => void
 }
 
 export default function SidebarHeader({
-  chatState,
-  setChatState,
-  editor,
-  setEditor,
-  setLoading
+  onUpdateConversation
 }: Props) {
-  const handleShortcut = async (shortcut: 'EXPLAIN' | 'FIX' | 'TEST') => {
-    if (!editor?.selectedText) return
-
-    setLoading(true)
-    let prompt = ''
-    if (shortcut === 'EXPLAIN') {
-      prompt = `Explain this code:\n\n${editor.selectedText}`
-    }
-    if (shortcut === 'FIX') {
-      prompt = `Fix this code:\n\n${editor.selectedText}`
-    }
-    if (shortcut === 'TEST') {
-      prompt = `Test this code:\n\n${editor.selectedText}`
-    }
-    try {
-      const content = await OpenAIStream(
-        [...chatState, { role: 'user', content: prompt }],
-        window.openAIPayload!
-      )
-      if (!content) {
-        vscode.postMessage({
-          command: VSCodeMessageTypes.ApiSidebarError,
-          text: 'Something went wrong with the API. Please try again later.',
-        });
-        return
-      }
-      vscode.setState([
-        ...chatState,
-        { role: 'system', content, language: editor?.language }
-      ])
-      setChatState((prev) => [...prev, { role: 'system', content, language: editor?.language }])
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setLoading(false)
-      setEditor(null)
-    }
-  }
-
   const getSelectedText = () => {
     vscode.postMessage({
       command: VSCodeMessageTypes.SelectedText
@@ -70,13 +22,13 @@ export default function SidebarHeader({
         <p>You can ask generic questions, but what I'm really good at is helping you with your code. For example:</p>
         <div className="flex flex-col gap-2">
           <p>
-            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => handleShortcut('TEST')} className="font-bold">Generate unit tests of my code.</VSCodeLink>
+            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation('TEST')} className="font-bold">Generate unit tests of my code.</VSCodeLink>
           </p>
           <p>
-            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => handleShortcut('EXPLAIN')} className="font-bold">Explain the selected code.</VSCodeLink>
+            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation('EXPLAIN')} className="font-bold">Explain the selected code.</VSCodeLink>
           </p>
           <p>
-            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => handleShortcut('FIX')} className="font-bold">Propose a fix for the bugs in my code.</VSCodeLink>
+            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation('FIX')} className="font-bold">Propose a fix for the bugs in my code.</VSCodeLink>
           </p>
         </div>
         <p>
