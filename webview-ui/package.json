@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.2.2",
+    "just-throttle": "4.2.0",
     "langchain": "0.0.97",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

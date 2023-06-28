@@ -9,6 +9,7 @@ specifiers:
   '@vitejs/plugin-react-swc': ^3.0.0
   '@vscode/webview-ui-toolkit': ^1.2.2
   autoprefixer: ^10.4.13
+  just-throttle: 4.2.0
   langchain: 0.0.97
   postcss: ^8.4.21
   react: ^18.2.0
@@ -23,6 +24,7 @@ specifiers:
 
 dependencies:
   '@vscode/webview-ui-toolkit': 1.2.2_react@18.2.0
+  just-throttle: 4.2.0
   langchain: 0.0.97
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -1010,6 +1012,10 @@ packages:
   /jsonpointer/5.0.1:
     resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
     engines: {node: '>=0.10.0'}
+    dev: false
+
+  /just-throttle/4.2.0:
+    resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==}
     dev: false
 
   /kleur/4.1.5:
