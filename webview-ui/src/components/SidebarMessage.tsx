@@ -32,23 +32,24 @@ export default function SideMessage({ content, role, language = '' }: Message) {
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              code: ({ node, inline, className, children, ...props }) => {
-                const match = /language-(\w+)/.exec(className || '')
+              code ({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className ?? '')
 
-                return !inline && (match || language) ? (
-                  <CodeBlock
-                    key={uuidv4()}
-                    // style={theme}
-                    language={match?.[1] ?? language}
-                    value={String(children).replace(/\n$/, '')}
-                    {...props}
-                  />
-                ) : (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                )
-              }
+                return !inline
+                  ? (
+                    <CodeBlock
+                      key={Math.random()}
+                      language={(match && match[1]) ?? ''}
+                      value={String(children).replace(/\n$/, '')}
+                      {...props}
+                    />
+                    )
+                  : (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                    )
+              },
             }}
           >
             {content}
