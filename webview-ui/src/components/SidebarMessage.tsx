@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 
 import type { Message } from '../types.d';
 
-export default function SidebarMessage({ content, role, language = '' }: Message) {
+export default function SidebarMessage({ content, role, language }: Message) {
   return (
     <div className='mx-4 flex flex-col justify-center'>
       {role === 'user' ? (

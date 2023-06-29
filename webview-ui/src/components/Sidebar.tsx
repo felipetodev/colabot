@@ -226,7 +226,7 @@ ${editor.selectedText}
 
         <VSCodeDivider className="block m-0 mt-5 bg-gray-500/10 h-0.5" role="separator" />
 
-        {chatState.map(({ role, content, language = '' }) => (
+        {chatState.map(({ role, content, language }) => (
           <Fragment key={uuidv4()}>
             <div className={`py-4 ${role === 'user' ? '' : 'bg-[var(--vscode-editor-background)]'}`}>
               <SidebarMessage
