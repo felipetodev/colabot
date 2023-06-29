@@ -12,11 +12,11 @@ export async function LangChainStream (chatUpdate: ChatState, vsCodePayload: Ope
   const prompt = chatUpdate.slice(-1)[0].content
   const chatHistory = chatUpdate
     ? chatUpdate
-      .map((entry) => {
-        return `${entry.role.toUpperCase()}: ${entry.content}`;
+      .map(({ role, content }) => {
+        return `${role.toUpperCase()}: ${content}`;
       })
       .reverse()
-      .slice(0, 10)
+      .slice(1, 10)
     : [];
 
   const {
@@ -57,20 +57,19 @@ export async function LangChainStream (chatUpdate: ChatState, vsCodePayload: Ope
   const chatPrompt = ChatPromptTemplate.fromPromptMessages([
     SystemMessagePromptTemplate.fromTemplate(
       `You are ColaBOT Chat representative who loves to help people. Answer the question based on the context below. You should follow ALL the following rules when generating and answer:
-      - There will be a CONVERSATION LOG, and a QUESTION.
+      - There will be a ##CONVERSATION LOG, and a ##QUESTION.
       - The final answer must always be styled using markdown.
       - Your main goal is to provide the user with an answer that is relevant to the question.
       - Provide the user with a code example that is relevant to the question, if the context contains relevant code examples. Do not make up any code examples on your own.
-      - Take into account the entire conversation so far, marked as CONVERSATION LOG, but prioritize the QUESTION.
+      - Take into account the entire conversation so far, marked as ##CONVERSATION LOG, but prioritize the ##QUESTION.
       - Use bullet points, lists, paragraphs and text styling to present the answer in markdown.
-      - Do not mention the CONVERSATION LOG in the answer, but use them to generate the answer.
-      - ALWAYS prefer the result with the highest "score" value.
+      - Do not mention the ##CONVERSATION LOG in the answer, but use them to generate the answer.
       - Ignore any content that is stored in html tables.
 
-      CONVERSATION LOG: {conversationHistory}`
+      ##CONVERSATION LOG: {conversationHistory}`
     ),
     HumanMessagePromptTemplate.fromTemplate(
-      `QUESTION: {question}
+      `##QUESTION: {question}
 
       Final Answer: `
     ),
