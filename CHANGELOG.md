@@ -30,3 +30,12 @@ All notable changes to the "colabot" extension will be documented in this file.
 ### Minor Changes
 
 - Add sidebar ColaBOT chat (new ✨)
+
+## 1.8.0
+
+### Minor Changes
+
+- Add new chat UI
+- Add shortcuts
+- Add streaming in response
+- Add auto scroll while streaming
