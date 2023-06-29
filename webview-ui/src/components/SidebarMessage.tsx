@@ -1,11 +1,10 @@
 import CodeBlock from './CodeBlock';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm';
-import { v4 as uuidv4 } from 'uuid';
 
 import type { Message } from '../types.d';
 
-export default function SideMessage({ content, role, language = '' }: Message) {
+export default function SidebarMessage({ content, role, language = '' }: Message) {
   return (
     <div className='mx-4 flex flex-col justify-center'>
       {role === 'user' ? (
@@ -39,7 +38,7 @@ export default function SideMessage({ content, role, language = '' }: Message) {
                   ? (
                     <CodeBlock
                       key={Math.random()}
-                      language={(match && match[1]) ?? ''}
+                      language={language ?? (match && match[1]) ?? ''}
                       value={String(children).replace(/\n$/, '')}
                       {...props}
                     />

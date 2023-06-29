@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState, Fragment } from "react"
+import { FormEvent, useEffect, useState, Fragment } from "react"
 import SidebarHeader from "./SidebarHeader"
 import Loading from "./Loading"
 import SendIcon from "./SendIcon"
@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { vscode } from "../utils/vscode"
 import { VSCodeButton, VSCodeDivider, VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
 import { LangChainStream } from "../utils/opaneai-chain"
+import useAutoScroll from "../hooks/useAutoScroll"
+import throttle from 'just-throttle'
 
 import { type ChatState, type Editor, VSCodeMessageTypes } from "../types.d"
 
@@ -15,8 +17,20 @@ export default function Sidebar() {
   const [userPrompt, setUserPrompt] = useState<string>('')
   const [editor, setEditor] = useState<Editor>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  
+  const {
+    textareaRef,
+    messagesEndRef,
+    chatContainerRef,
+    handleScroll,
+    scrollDown,
+  } = useAutoScroll()
+
+  const throttledScrollDown = throttle(scrollDown, 250)
+
+  useEffect(() => {
+    throttledScrollDown()
+  }, [chatState.length, throttledScrollDown])
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -100,11 +114,6 @@ export default function Sidebar() {
       }
     })
   }, [])
-
-  useEffect(() => {
-    inputRef.current?.focus()
-    containerRef.current?.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' })
-  }, [chatState.length])
 
   const handlePrompt = (value: string) => {
     vscode.postMessage({
@@ -196,7 +205,11 @@ ${editor.selectedText}
   }
 
   return (
-    <div ref={containerRef} className="h-full min-h-screen flex flex-col pt-4">
+    <div
+      ref={chatContainerRef}
+      onScroll={handleScroll}
+      className="h-full min-h-screen flex flex-col pt-4"
+    >
       <div className="px-4 bg-[var(--vscode-sideBar-background)] sticky top-0 z-10 flex justify-between items-center pb-4">
         <span className="flex justify-center items-center bg-white p-1.5 w-8 h-8 text-lg rounded-full mr-2">🤖</span>
         <h1 className='font-bold'>
@@ -225,6 +238,10 @@ ${editor.selectedText}
             <VSCodeDivider className="block m-0 bg-gray-500/10 h-0.5" role="separator" />
           </Fragment>
         ))}
+        <div
+          className='h-0.5'
+          ref={messagesEndRef}
+        />
       </div>
 
       {/* var(--vscode-editor-foreground) */}
@@ -234,7 +251,7 @@ ${editor.selectedText}
           <div className='relative block'>
             <VSCodeTextField
               // @ts-ignore
-              ref={inputRef}
+              ref={textareaRef}
               value={userPrompt}
               onInput={({ target }) => {
                 const { value } = target as HTMLInputElement;
