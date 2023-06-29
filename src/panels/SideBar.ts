@@ -11,7 +11,7 @@ import {
 } from 'vscode'
 import { openAIPayload } from '../OpenAI'
 import { getNonce, getUri } from './utils'
-import { Credentials } from '../authentication'
+// import { Credentials } from '../authentication'
 import { Util } from '../Util'
 
 export class SidebarProvider implements WebviewViewProvider {
@@ -73,8 +73,8 @@ export class SidebarProvider implements WebviewViewProvider {
   }
 
   private async _setWebviewMessageListener (webview: Webview) {
-    const credentials = new Credentials()
-    await credentials.initialize(this._context)
+    // const credentials = new Credentials()
+    // await credentials.initialize(this._context)
     webview.onDidReceiveMessage(
       async (message: any) => {
         const command = message.command
@@ -121,18 +121,18 @@ export class SidebarProvider implements WebviewViewProvider {
             env.clipboard.writeText(text)
             break
           }
-          case 'signIn': {
-            const octokit = await credentials.getOctokit()
-            const { data } = await octokit.users.getAuthenticated()
-            if (data) {
-              this._view?.webview.postMessage({
-                type: 'signInData',
-                user: data
-              })
-              window.showInformationMessage(`Logged into GitHub as ${data.login}`)
-            }
-            break
-          }
+          // case 'signIn': {
+          //   const octokit = await credentials.getOctokit()
+          //   const { data } = await octokit.users.getAuthenticated()
+          //   if (data) {
+          //     this._view?.webview.postMessage({
+          //       type: 'signInData',
+          //       user: data
+          //     })
+          //     window.showInformationMessage(`Logged into GitHub as ${data.login}`)
+          //   }
+          //   break
+          // }
           // case 'createPullRequest': {
           //   // get token
           //   const octokit = await credentials.getOctokit()
