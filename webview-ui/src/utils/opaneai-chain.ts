@@ -8,7 +8,12 @@ import { LLMChain } from "langchain/chains";
 
 import { type ChatState, OpenAIStreamPayload } from "../types"
 
-export async function LangChainStream (chatUpdate: ChatState, vsCodePayload: OpenAIStreamPayload, cb: any) {
+export async function LangChainStream (
+  chatUpdate: ChatState,
+  selectedText: string,
+  vsCodePayload: OpenAIStreamPayload,
+  cb: any
+) {
   const prompt = chatUpdate.slice(-1)[0].content
   const chatHistory = chatUpdate
     ? chatUpdate
@@ -69,7 +74,7 @@ export async function LangChainStream (chatUpdate: ChatState, vsCodePayload: Ope
       ##CONVERSATION LOG: {conversationHistory}`
     ),
     HumanMessagePromptTemplate.fromTemplate(
-      `##QUESTION: {question}
+      `##QUESTION: {question} {selectedText}
 
       Final Answer: `
     ),
@@ -82,6 +87,7 @@ export async function LangChainStream (chatUpdate: ChatState, vsCodePayload: Ope
 
   const result = await chain.call({
     question: prompt,
+    selectedText,
     conversationHistory: chatHistory
   });
 

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState, Fragment } from "react"
+import { FormEvent, useEffect, useState, Fragment, memo } from "react"
 import SidebarHeader from "./SidebarHeader"
 import Loading from "./Loading"
 import SendIcon from "./SendIcon"
@@ -12,9 +12,8 @@ import throttle from 'just-throttle'
 
 import { type ChatState, type Editor, VSCodeMessageTypes } from "../types.d"
 
-export default function Sidebar() {
+const Sidebar = memo(function Sidebar() {
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
-  const [userPrompt, setUserPrompt] = useState<string>('')
   const [editor, setEditor] = useState<Editor>(null)
   const [loading, setLoading] = useState<boolean>(false)
   
@@ -43,14 +42,12 @@ export default function Sidebar() {
       return
     }
 
-    if (!userPrompt) return
-
-    const message = editor?.selectedText
-      ? `${userPrompt}\n\n${editor.selectedText}`
-      : userPrompt
+    const message = textareaRef.current?.value
+    const selectedText = editor?.selectedText ?? ''
+    if (!message) return
 
     setLoading(true)
-    setChatState((prev) => [...prev, { role: 'user', content: userPrompt }])
+    setChatState((prev) => [...prev, { role: 'user', content: message }])
 
     let chatUpdate: ChatState = [...chatState, { role: 'user', content: message }]
 
@@ -59,10 +56,13 @@ export default function Sidebar() {
     try {
       await LangChainStream(
         chatUpdate,
+        selectedText,
         payload,
         ({ message }: { message: string }) => {
           if (message === '[DONE]' || message === '[ERROR]') {
-            setUserPrompt('')
+            if (textareaRef.current) {
+              textareaRef.current.value = ''
+            }
             setEditor(null)
             setLoading(false)
             return
@@ -93,13 +93,13 @@ export default function Sidebar() {
 
       vscode.setState([
         ...chatState,
-        { role: 'user', content: userPrompt },
+        { role: 'user', content: message },
         { role: 'system', content: text, language: editor?.language }
       ])
     } catch (error) {
       console.error(error)
     } finally {
-      setUserPrompt('')
+      textareaRef.current.value = ''
       setEditor(null)
       setLoading(false)
     }
@@ -118,8 +118,7 @@ export default function Sidebar() {
   const handlePrompt = (value: string) => {
     vscode.postMessage({
       command: VSCodeMessageTypes.SelectedText
-    });
-    setUserPrompt(value)
+    })
   }
 
   const clearChatContext = () => {
@@ -128,27 +127,18 @@ export default function Sidebar() {
   }
 
   const handleUpdateConversation = async (type: 'EXPLAIN' | 'FIX' | 'TEST') => {
-    if (!editor?.selectedText) return
-
+    const selectedText = editor?.selectedText
+    if (!selectedText) return
     setLoading(true)
     let prompt = ''
     if (type === 'EXPLAIN') {
-      prompt = `Explain this code:\n
-\`\`\`${editor.language}
-${editor.selectedText}
-\`\`\``
+      prompt = 'Explain this code'
     }
     if (type === 'FIX') {
-      prompt = `Fix this code:\n
-\`\`\`${editor.language}
-${editor.selectedText}
-\`\`\``
+      prompt = 'Fix this code'
     }
     if (type === 'TEST') {
-      prompt = `Test this code:\n
-\`\`\`${editor.language}
-${editor.selectedText}
-\`\`\``
+      prompt = 'Test this code'
     }
 
     let chatUpdate: ChatState = [...chatState, { role: 'user', content: prompt }]
@@ -159,10 +149,13 @@ ${editor.selectedText}
     try {
       await LangChainStream(
         chatUpdate,
+        selectedText,
         window.openAIPayload!,
         ({ message }: { message: string }) => {
           if (message === '[DONE]' || message === '[ERROR]') {
-            setUserPrompt('')
+            if (textareaRef.current) {
+              textareaRef.current.value = ''
+            }
             setEditor(null)
             setLoading(false)
             return
@@ -252,7 +245,6 @@ ${editor.selectedText}
             <VSCodeTextField
               // @ts-ignore
               ref={textareaRef}
-              value={userPrompt}
               onInput={({ target }) => {
                 const { value } = target as HTMLInputElement;
                 handlePrompt(value);
@@ -273,4 +265,6 @@ ${editor.selectedText}
       </div>
     </div>
   )
-}
+})
+
+export default Sidebar
