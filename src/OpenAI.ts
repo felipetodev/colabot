@@ -12,7 +12,8 @@ export const openAIPayload = {
   presence_penalty: 0,
   max_tokens: config.get('maxTokens') as number,
   stream: false,
-  n: 1
+  n: 1,
+  organizationId: config.get('organizationId') as string
 }
 
 export async function OpenAIStream (selectedText: string, apiKey: string = '') {

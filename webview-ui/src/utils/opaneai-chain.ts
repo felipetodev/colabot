@@ -32,6 +32,7 @@ export async function LangChainStream (
     frequency_penalty: frequencyPenalty,
     presence_penalty: presencePenalty,
     // stream: streaming
+    organizationId
   } = vsCodePayload
 
   const chat = new ChatOpenAI({
@@ -52,12 +53,13 @@ export async function LangChainStream (
         },
         handleLLMError: async (e) => {
           cb({ message: '[ERROR]' })
-        },
+        }
       }
     ]
-  }, {
-    // organization: ''
-  })
+  }, organizationId
+    ? { organization: organizationId }
+    : {}
+  )
 
   const chatPrompt = ChatPromptTemplate.fromPromptMessages([
     SystemMessagePromptTemplate.fromTemplate(

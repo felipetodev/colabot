@@ -25,6 +25,7 @@ export type OpenAIStreamPayload = {
   stream: boolean;
   n: number;
   apiKey: string;
+  organizationId: string;
 }
 
 export type Editor = {
