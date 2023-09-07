@@ -191,6 +191,6 @@
   "dependencies": {
     "@octokit/rest": "19.0.7",
     "cohere-ai": "^6.0.0",
-    "openai": "^3.2.1"
+    "openai": "^4.5.0"
   }
 }
