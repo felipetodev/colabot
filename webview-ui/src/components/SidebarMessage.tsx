@@ -1,10 +1,11 @@
+import { memo } from 'react'
 import CodeBlock from './CodeBlock';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm';
 
 import type { Message } from '../types.d';
 
-export default function SidebarMessage({ content, role, language }: Message) {
+const SidebarMessage = memo(function SidebarMessage({ content, role, language }: Message) {
   return (
     <div className='mx-4 flex flex-col justify-center'>
       {role === 'user' ? (
@@ -57,4 +58,6 @@ export default function SidebarMessage({ content, role, language }: Message) {
       </div>
     </div>
   )
-}
+})
+
+export default SidebarMessage
