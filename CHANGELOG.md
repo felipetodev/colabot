@@ -39,3 +39,11 @@ All notable changes to the "colabot" extension will be documented in this file.
 - Add shortcuts
 - Add streaming in response
 - Add auto scroll while streaming
+
+## 1.9.0
+
+### Minor Changes
+
+- Fix chat input
+- Add OpenAI models and organization
+- Add input expand Y axis while typing
