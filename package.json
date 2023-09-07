@@ -119,35 +119,42 @@
           "default": "gpt-3.5-turbo",
           "enum": [
             "gpt-3.5-turbo",
-            "text-davinci-003",
+            "gpt-3.5-turbo-16k",
+            "gpt-4",
+            "gpt-4-32k",
             "command-xlarge-nightly",
             "summarize-xlarge"
           ],
           "order": 2
         },
+        "colaBot.organizationId": {
+          "type": "string",
+          "markdownDescription": "OpenAI [Organization ID](https://platform.openai.com/docs/api-reference/requesting-organization) (For some OpenAI models, this field may need to be completed for their operation).",
+          "order": 3
+        },
         "colaBot.maxTokens": {
           "type": "number",
           "description": "The maximum number of tokens to generate",
           "default": 1500,
-          "order": 3
+          "order": 4
         },
         "colaBot.temperature": {
           "type": "number",
           "description": "The temperature of the model (between 0 and 1)",
           "default": 0.3,
-          "order": 4
+          "order": 5
         },
         "colaBot.gitMoji": {
           "type": "boolean",
           "description": "Use gitmoji in your SemVer commits",
           "default": true,
-          "order": 5
+          "order": 6
         },
         "colaBot.semanticVersioningSpecification": {
           "type": "boolean",
           "description": "Use semantic versioning specification in your commits",
           "default": true,
-          "order": 6
+          "order": 7
         }
       }
     }
