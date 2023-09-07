@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { workspace } from 'vscode'
-import { Configuration, OpenAIApi } from 'openai'
+import OpenAI from 'openai'
 
 const config = workspace.getConfiguration('colaBot')
 
@@ -16,24 +16,28 @@ export const openAIPayload = {
   organizationId: config.get('organizationId') as string
 }
 
-export async function OpenAIStream (selectedText: string, apiKey: string = '') {
-  const openai = new OpenAIApi(new Configuration({ apiKey }))
+export async function OpenAIStream (selectedText: string, apiKey: string = ''): Promise<string> {
+  const openai = new OpenAI({
+    apiKey,
+    ...openAIPayload.organizationId
+      ? { organization: openAIPayload.organizationId }
+      : {}
+  })
+
   try {
-    if (openAIPayload.model === 'gpt-3.5-turbo') {
-      const completion = await openai.createChatCompletion({
-        ...openAIPayload,
-        messages: [{ role: 'user', content: selectedText }]
-      })
-
-      return completion.data.choices[0].message?.content
-    }
-
-    const completion = await openai.createCompletion({
-      prompt: selectedText,
-      ...openAIPayload
+    const completion = await openai.chat.completions.create({
+      messages: [{ role: 'user', content: selectedText }],
+      model: openAIPayload.model,
+      temperature: openAIPayload.temperature,
+      top_p: 1,
+      stream: false,
+      max_tokens: openAIPayload.max_tokens,
+      frequency_penalty: openAIPayload.frequency_penalty,
+      presence_penalty: openAIPayload.presence_penalty,
+      n: 1
     })
 
-    return completion.data.choices[0].text!
+    return completion.choices[0].message.content!
   } catch (error) {
     const errorAsAny = error as any
     if (errorAsAny.code === 'ENOTFOUND') {
@@ -42,7 +46,6 @@ export async function OpenAIStream (selectedText: string, apiKey: string = '') {
       )
     }
 
-    errorAsAny.message = `OpenAI API Error: ${errorAsAny.message} - ${errorAsAny.response.statusText}`
-    throw errorAsAny
+    throw errorAsAny.message
   }
 }

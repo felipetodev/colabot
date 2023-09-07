@@ -64,7 +64,11 @@ export async function activate (context: vscode.ExtensionContext) {
           if (commitType.includes(COMMIT_TYPES.ai.description)) {
             const promptMessage = await generateCommitMessage(withSemVer)
             if (promptMessage) {
-              aiCommitMessage = await getApiResponse(promptMessage)
+              try {
+                aiCommitMessage = await getApiResponse(promptMessage)
+              } catch (err) {
+                vscode.window.showErrorMessage(err as any)
+              }
             }
           }
           vscode.window
@@ -108,7 +112,7 @@ export async function activate (context: vscode.ExtensionContext) {
             })
         })
     } catch (err) {
-      vscode.window.showErrorMessage((err as Error).message)
+      vscode.window.showErrorMessage(err as any)
       process.exit(1)
     }
   })
@@ -162,7 +166,7 @@ export async function activate (context: vscode.ExtensionContext) {
         const response = await getApiResponse(comment)
         if (response) Panel.render(context.extensionUri, response)
       } catch (err) {
-        vscode.window.showErrorMessage((err as Error).message)
+        vscode.window.showErrorMessage(err as any)
       }
     })
   )
@@ -199,7 +203,7 @@ export async function activate (context: vscode.ExtensionContext) {
             const response = await getApiResponse(value)
             if (response) Panel.render(context.extensionUri, replaceWithUnicodes(response))
           } catch (err) {
-            vscode.window.showErrorMessage((err as Error).message)
+            vscode.window.showErrorMessage(err as any)
           }
         })
     })
@@ -219,7 +223,7 @@ export async function activate (context: vscode.ExtensionContext) {
         const response = await getApiResponse(message)
         if (response) Panel.render(context.extensionUri, response)
       } catch (err) {
-        vscode.window.showErrorMessage((err as Error).message)
+        vscode.window.showErrorMessage(err as any)
       }
     })
   )

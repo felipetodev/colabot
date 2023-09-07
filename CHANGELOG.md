@@ -47,3 +47,4 @@ All notable changes to the "colabot" extension will be documented in this file.
 - Fix chat input
 - Add OpenAI models and organization
 - Add input expand Y axis while typing
+- Update OpenAI Node API Library
