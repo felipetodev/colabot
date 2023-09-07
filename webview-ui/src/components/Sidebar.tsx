@@ -1,11 +1,10 @@
-import { FormEvent, useEffect, useState, Fragment, memo } from "react"
+import { useEffect, useState, Fragment, memo } from "react"
 import SidebarHeader from "./SidebarHeader"
-import Loading from "./Loading"
-import SendIcon from "./SendIcon"
 import SidebarMessage from "./SidebarMessage"
+import ChatInput from "./ChatInput"
 import { v4 as uuidv4 } from 'uuid';
 import { vscode } from "../utils/vscode"
-import { VSCodeButton, VSCodeDivider, VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
+import { VSCodeButton, VSCodeDivider } from "@vscode/webview-ui-toolkit/react"
 import { LangChainStream } from "../utils/opaneai-chain"
 import useAutoScroll from "../hooks/useAutoScroll"
 import throttle from 'just-throttle'
@@ -13,6 +12,7 @@ import throttle from 'just-throttle'
 import { type ChatState, type Editor, VSCodeMessageTypes } from "../types.d"
 
 const Sidebar = memo(function Sidebar() {
+  const [content, setContent] = useState('')
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
   const [editor, setEditor] = useState<Editor>(null)
   const [loading, setLoading] = useState<boolean>(false)
@@ -31,8 +31,7 @@ const Sidebar = memo(function Sidebar() {
     throttledScrollDown()
   }, [chatState.length, throttledScrollDown])
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSend = async () => {
     const payload = window.openAIPayload
     if (!payload) {
       vscode.postMessage({
@@ -98,10 +97,20 @@ const Sidebar = memo(function Sidebar() {
       ])
     } catch (error) {
       console.error(error)
+      const { message } = error as { message: string }
+      
+      const errIndex = message.indexOf('{')
+      const jsonError = message.slice(errIndex)
+
+      vscode.postMessage({
+        command: VSCodeMessageTypes.PayloadSidebarError,
+        text: JSON.parse(jsonError).error.message
+      });
     } finally {
       textareaRef.current.value = ''
       setEditor(null)
       setLoading(false)
+      setContent('')
     }
   }
 
@@ -119,6 +128,7 @@ const Sidebar = memo(function Sidebar() {
     vscode.postMessage({
       command: VSCodeMessageTypes.SelectedText
     })
+    setContent(value)
   }
 
   const clearChatContext = () => {
@@ -197,13 +207,23 @@ const Sidebar = memo(function Sidebar() {
     }
   }
 
+  useEffect(() => {
+    if (textareaRef && textareaRef.current) {
+      textareaRef.current.style.height = 'inherit'
+      textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`
+      textareaRef.current.style.overflow = `${
+        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+      }`
+    }
+  }, [content])
+
   return (
     <div
       ref={chatContainerRef}
       onScroll={handleScroll}
-      className="h-full min-h-screen flex flex-col pt-4"
+      className="h-full min-h-screen flex flex-col"
     >
-      <div className="px-4 bg-[var(--vscode-sideBar-background)] sticky top-0 z-10 flex justify-between items-center pb-4">
+      <div className="py-2 px-4 bg-[var(--vscode-sideBar-background)] sticky top-0 z-10 flex justify-between items-center">
         <span className="flex justify-center items-center bg-white p-1.5 w-8 h-8 text-lg rounded-full mr-2">🤖</span>
         <h1 className='font-bold'>
           ColaBOT Chat
@@ -239,30 +259,13 @@ const Sidebar = memo(function Sidebar() {
 
       {/* var(--vscode-editor-foreground) */}
 
-      <div className='mt-auto sticky bottom-0 bg-[var(--vscode-sideBar-background)]'>
-        <form onSubmit={handleSubmit} className='pb-2 pt-4 px-4'>
-          <div className='relative block'>
-            <VSCodeTextField
-              // @ts-ignore
-              ref={textareaRef}
-              onInput={({ target }) => {
-                const { value } = target as HTMLInputElement;
-                handlePrompt(value);
-              }}
-              autofocus
-              placeholder='How can I help you?'
-              name='prompt'
-              type='text'
-              style={{ width: '100%' }}
-            />
-            <div className='absolute top-0 flex items-center justify-center h-full right-4'>
-              <button disabled={loading} className='transition-all hover:scale-125' type='submit'>
-                {loading ? <Loading /> : <SendIcon />}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+      <ChatInput
+        content={content}
+        textareaRef={textareaRef}
+        loading={loading}
+        onSend={handleSend}
+        onPrompt={({ target }) => handlePrompt(target.value)}
+      />
     </div>
   )
 })
