@@ -4,7 +4,7 @@ import SidebarMessage from "./SidebarMessage"
 import ChatInput from "./ChatInput"
 import { v4 as uuidv4 } from 'uuid';
 import { vscode } from "../utils/vscode"
-import { VSCodeButton, VSCodeDivider } from "@vscode/webview-ui-toolkit/react"
+import { VSCodeDivider } from "@vscode/webview-ui-toolkit/react"
 import { LangChainStream } from "../utils/opaneai-chain"
 import useAutoScroll from "../hooks/useAutoScroll"
 import throttle from 'just-throttle'
@@ -117,9 +117,13 @@ const Sidebar = memo(function Sidebar() {
   useEffect(() => {
     // set up listener for selected text from editor
     window.addEventListener('message', async (event) => {
-      const { type, editor } = event.data as { type: 'selectedText', editor: Editor }
+      const { type, editor } = event.data as { type: 'selectedText' | 'clearChat', editor: Editor }
       if (type === 'selectedText') {
         setEditor(editor)
+      }
+      if (type === 'clearChat') {
+        setChatState([])
+        vscode.setState([])
       }
     })
   }, [])
@@ -129,11 +133,6 @@ const Sidebar = memo(function Sidebar() {
       command: VSCodeMessageTypes.SelectedText
     })
     setContent(value)
-  }
-
-  const clearChatContext = () => {
-    setChatState([])
-    vscode.setState([])
   }
 
   const handleUpdateConversation = async (type: 'EXPLAIN' | 'FIX' | 'TEST') => {
@@ -223,15 +222,6 @@ const Sidebar = memo(function Sidebar() {
       onScroll={handleScroll}
       className="h-full min-h-screen flex flex-col"
     >
-      <div className="py-2 px-4 bg-[var(--vscode-sideBar-background)] sticky top-0 z-10 flex justify-between items-center">
-        <span className="flex justify-center items-center bg-white p-1.5 w-8 h-8 text-lg rounded-full mr-2">🤖</span>
-        <h1 className='font-bold'>
-          ColaBOT Chat
-        </h1>
-        <VSCodeButton appearance="secondary" className="flex ml-auto" onClick={clearChatContext}>
-          Clear Chat
-        </VSCodeButton>
-      </div>
       <div>
         <SidebarHeader
           onUpdateConversation={handleUpdateConversation}

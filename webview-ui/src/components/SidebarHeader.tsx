@@ -17,6 +17,14 @@ export default function SidebarHeader({
 
   return (
     <div className="px-4">
+      <div className="flex items-center py-2">
+        <span className="flex justify-center items-center bg-white p-1.5 w-8 h-8 text-lg rounded-full mr-2">
+          🤖
+        </span>
+        <h1 className='font-bold'>
+          ColaBOT Chat
+        </h1>
+      </div>
       <div className="flex flex-col gap-3">
         <p>Welcome, I'm ColaBOT and I'm here to help you get things done faster. I can identify issues, explain and even improve code.</p>
         <p>You can ask generic questions, but what I'm really good at is helping you with your code. For example:</p>
