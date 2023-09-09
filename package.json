@@ -1,13 +1,9 @@
 {
-  "name": "colabot-vscode",
-  "displayName": "ColaBOT: AI assistant",
-  "description": "Extension that uses AI to help you code faster",
-  "version": "1.9.1",
-  "engines": {
-    "vscode": "^1.75.0"
+  "activationEvents": [],
+  "author": {
+    "email": "fe.ossandon.u@gmail.com",
+    "name": "Felipe Ossandon"
   },
-  "publisher": "ColaBOT",
-  "icon": "assets/icon.png",
   "categories": [
     "Data Science",
     "Programming Languages",
@@ -17,36 +13,116 @@
     "Education",
     "Other"
   ],
-  "author": {
-    "name": "Felipe Ossandon",
-    "email": "fe.ossandon.u@gmail.com"
-  },
-  "repository": {
-    "url": "https://github.com/felipetodev/colabot"
-  },
-  "main": "./out/extension.js",
-  "activationEvents": [],
   "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "colabot-sidebar-chat",
-          "title": "ColaBOT Chat",
-          "icon": "assets/icon-vector.png"
+    "commands": [
+      {
+        "category": "ColaBOT",
+        "command": "colabot-vscode.getCode",
+        "title": "Get Code"
+      },
+      {
+        "category": "ColaBOT",
+        "command": "colabot-vscode.setApiKey",
+        "title": "Set API Key"
+      },
+      {
+        "category": "ColaBOT",
+        "command": "colabot-vscode.removeApiKey",
+        "title": "Remove API Key"
+      },
+      {
+        "category": "ColaBOT",
+        "command": "colabot-vscode.askCode",
+        "title": "Ask ColaBOT"
+      },
+      {
+        "category": "ColaBOT",
+        "command": "colabot-vscode.explainCode",
+        "title": "Explain ColaBOT"
+      },
+      {
+        "category": "ColaBOT (Git)",
+        "command": "colabot-vscode.aiCommit",
+        "title": "AI Commit"
+      },
+      {
+        "command": "colabot-vscode.clearChat",
+        "icon": "$(clear-all)",
+        "title": "Clear"
+      },
+      {
+        "command": "colabot-vscode.chatFeedback",
+        "icon": "$(feedback)",
+        "title": "Send Chat Feedback"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "colaBot.apiKey": {
+          "default": "openai",
+          "description": "To use ColaBOT press (ctrl+shift+p) and search for 'ColaBOT: Set API Key'. then select your AI provider:",
+          "enum": [
+            "openai",
+            "cohere"
+          ],
+          "order": 1,
+          "type": "string"
+        },
+        "colaBot.gitMoji": {
+          "default": true,
+          "description": "Use gitmoji in your SemVer commits",
+          "order": 6,
+          "type": "boolean"
+        },
+        "colaBot.maxTokens": {
+          "default": 1500,
+          "description": "The maximum number of tokens to generate",
+          "order": 4,
+          "type": "number"
+        },
+        "colaBot.model": {
+          "default": "gpt-3.5-turbo",
+          "description": "The model to use for ColaBOT",
+          "enum": [
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-16k",
+            "gpt-4",
+            "gpt-4-32k",
+            "command-xlarge-nightly",
+            "summarize-xlarge"
+          ],
+          "order": 2,
+          "type": "string"
+        },
+        "colaBot.organizationId": {
+          "markdownDescription": "OpenAI [Organization ID](https://platform.openai.com/docs/api-reference/requesting-organization) (For some OpenAI models, this field may need to be completed for their operation).",
+          "order": 3,
+          "type": "string"
+        },
+        "colaBot.semanticVersioningSpecification": {
+          "default": true,
+          "description": "Use semantic versioning specification in your commits",
+          "order": 7,
+          "type": "boolean"
+        },
+        "colaBot.temperature": {
+          "default": 0.3,
+          "description": "The temperature of the model (between 0 and 1)",
+          "order": 5,
+          "type": "number"
         }
-      ]
+      },
+      "title": "ColaBOT 🤖",
+      "type": "object"
     },
-    "views": {
-      "colabot-sidebar-chat": [
-        {
-          "type": "webview",
-          "id": "colabot-sidebar",
-          "name": "",
-          "icon": "assets/icon-vector.png",
-          "contextualTitle": "ColaBOT"
-        }
-      ]
-    },
+    "keybindings": [
+      {
+        "command": "colabot-vscode.getCode",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i",
+        "when": "editorTextFocus"
+      }
+    ],
     "menus": {
       "editor/context": [
         {
@@ -57,120 +133,47 @@
           "command": "colabot-vscode.explainCode",
           "group": "colabot_commands"
         }
+      ],
+      "view/title": [
+        {
+          "command": "colabot-vscode.chatFeedback",
+          "group": "navigation@2",
+          "when": "view == colabot-sidebar"
+        },
+        {
+          "command": "colabot-vscode.clearChat",
+          "group": "navigation@1",
+          "when": "view == colabot-sidebar"
+        }
       ]
     },
-    "keybindings": [
-      {
-        "command": "colabot-vscode.getCode",
-        "key": "ctrl+shift+i",
-        "mac": "cmd+shift+i",
-        "when": "editorTextFocus"
-      }
-    ],
-    "commands": [
-      {
-        "command": "colabot-vscode.getCode",
-        "title": "Get Code",
-        "category": "ColaBOT"
-      },
-      {
-        "command": "colabot-vscode.setApiKey",
-        "title": "Set API Key",
-        "category": "ColaBOT"
-      },
-      {
-        "command": "colabot-vscode.removeApiKey",
-        "title": "Remove API Key",
-        "category": "ColaBOT"
-      },
-      {
-        "command": "colabot-vscode.askCode",
-        "title": "Ask ColaBOT",
-        "category": "ColaBOT"
-      },
-      {
-        "command": "colabot-vscode.explainCode",
-        "title": "Explain ColaBOT",
-        "category": "ColaBOT"
-      },
-      {
-        "command": "colabot-vscode.aiCommit",
-        "title": "AI Commit",
-        "category": "ColaBOT (Git)"
-      }
-    ],
-    "configuration": {
-      "title": "ColaBOT 🤖",
-      "type": "object",
-      "properties": {
-        "colaBot.apiKey": {
-          "type": "string",
-          "description": "To use ColaBOT press (ctrl+shift+p) and search for 'ColaBOT: Set API Key'. then select your AI provider:",
-          "default": "openai",
-          "enum": [
-            "openai",
-            "cohere"
-          ],
-          "order": 1
-        },
-        "colaBot.model": {
-          "type": "string",
-          "description": "The model to use for ColaBOT",
-          "default": "gpt-3.5-turbo",
-          "enum": [
-            "gpt-3.5-turbo",
-            "gpt-3.5-turbo-16k",
-            "gpt-4",
-            "gpt-4-32k",
-            "command-xlarge-nightly",
-            "summarize-xlarge"
-          ],
-          "order": 2
-        },
-        "colaBot.organizationId": {
-          "type": "string",
-          "markdownDescription": "OpenAI [Organization ID](https://platform.openai.com/docs/api-reference/requesting-organization) (For some OpenAI models, this field may need to be completed for their operation).",
-          "order": 3
-        },
-        "colaBot.maxTokens": {
-          "type": "number",
-          "description": "The maximum number of tokens to generate",
-          "default": 1500,
-          "order": 4
-        },
-        "colaBot.temperature": {
-          "type": "number",
-          "description": "The temperature of the model (between 0 and 1)",
-          "default": 0.3,
-          "order": 5
-        },
-        "colaBot.gitMoji": {
-          "type": "boolean",
-          "description": "Use gitmoji in your SemVer commits",
-          "default": true,
-          "order": 6
-        },
-        "colaBot.semanticVersioningSpecification": {
-          "type": "boolean",
-          "description": "Use semantic versioning specification in your commits",
-          "default": true,
-          "order": 7
+    "views": {
+      "colabot-sidebar-chat": [
+        {
+          "contextualTitle": "ColaBOT",
+          "icon": "assets/icon-vector.png",
+          "id": "colabot-sidebar",
+          "name": "",
+          "type": "webview"
         }
-      }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "icon": "assets/icon-vector.png",
+          "id": "colabot-sidebar-chat",
+          "title": "ColaBOT Chat"
+        }
+      ]
     }
   },
-  "scripts": {
-    "install:all": "pnpm install && cd webview-ui && pnpm install",
-    "start:webview": "cd webview-ui && pnpm run start",
-    "build:webview": "cd webview-ui && pnpm run build",
-    "vscode:prepublish": "pnpm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "ui:watch": "cd webview-ui && pnpm run watch",
-    "pretest": "pnpm run compile && pnpm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+  "dependencies": {
+    "@octokit/rest": "19.0.7",
+    "cohere-ai": "^6.0.0",
+    "openai": "^4.5.0"
   },
+  "description": "Extension that uses AI to help you code faster",
   "devDependencies": {
     "@types/glob": "^8.0.1",
     "@types/mocha": "^10.0.1",
@@ -188,9 +191,28 @@
     "mocha": "^10.1.0",
     "typescript": "^4.9.5"
   },
-  "dependencies": {
-    "@octokit/rest": "19.0.7",
-    "cohere-ai": "^6.0.0",
-    "openai": "^4.5.0"
-  }
+  "displayName": "ColaBOT: AI assistant",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "icon": "assets/icon.png",
+  "main": "./out/extension.js",
+  "name": "colabot-vscode",
+  "publisher": "ColaBOT",
+  "repository": {
+    "url": "https://github.com/felipetodev/colabot"
+  },
+  "scripts": {
+    "build:webview": "cd webview-ui && pnpm run build",
+    "compile": "tsc -p ./",
+    "install:all": "pnpm install && cd webview-ui && pnpm install",
+    "lint": "eslint src --ext ts",
+    "pretest": "pnpm run compile && pnpm run lint",
+    "start:webview": "cd webview-ui && pnpm run start",
+    "test": "node ./out/test/runTest.js",
+    "ui:watch": "cd webview-ui && pnpm run watch",
+    "vscode:prepublish": "pnpm run compile",
+    "watch": "tsc -watch -p ./"
+  },
+  "version": "1.9.1"
 }

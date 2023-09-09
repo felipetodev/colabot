@@ -227,6 +227,20 @@ export async function activate (context: vscode.ExtensionContext) {
       }
     })
   )
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('colabot-vscode.clearChat', async () => {
+      sidebarProvider._view?.webview.postMessage({
+        type: 'clearChat'
+      })
+    })
+  )
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('colabot-vscode.chatFeedback', async () => {
+      vscode.env.openExternal(vscode.Uri.parse('https://github.com/felipetodev/colabot/issues'))
+    })
+  )
 }
 
 // This method is called when your extension is deactivated
