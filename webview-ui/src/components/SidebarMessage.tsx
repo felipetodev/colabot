@@ -1,11 +1,28 @@
-import { memo } from 'react'
+import { useRef, memo, type FormEvent } from 'react'
 import CodeBlock from './CodeBlock';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm';
 
-import type { Message } from '../types.d';
+import { type Message } from '../types.d';
 
-const SidebarMessage = memo(function SidebarMessage({ content, role, language }: Message) {
+interface Props extends Message {
+  onHandleApiKey: (key: { key: string }) => void
+}
+
+const SidebarMessage = memo(function SidebarMessage({
+  content,
+  role,
+  language,
+  error = false,
+  onHandleApiKey
+}: Props) {
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!inputRef.current || !inputRef.current.value.trim()) return
+    onHandleApiKey({ key: inputRef.current.value })
+  }
   return (
     <div className='mx-4 flex flex-col justify-center'>
       {role === 'user' ? (
@@ -54,6 +71,22 @@ const SidebarMessage = memo(function SidebarMessage({ content, role, language }:
           >
             {content}
           </ReactMarkdown>
+          {error && (
+            <form onSubmit={handleSubmit} className='flex gap-x-2 items-end'>
+              <input
+                ref={inputRef}
+                type="password"
+                className="mt-1.5 h-6 bg-[var(--vscode-input-background)] p-2 focus:outline-[var(--vscode-focusBorder)] placeholder:opacity-50"
+                placeholder="•••••"
+              />
+              <button type='submit' className='hover:text-green-600'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M5 12l5 5l10 -10" />
+                </svg>
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

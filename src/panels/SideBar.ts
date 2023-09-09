@@ -1,6 +1,7 @@
 import {
   env,
   window,
+  commands,
   workspace,
   type ExtensionContext,
   type Webview,
@@ -11,8 +12,9 @@ import {
 } from 'vscode'
 import { openAIPayload } from '../OpenAI'
 import { getNonce, getUri } from './utils'
-// import { Credentials } from '../authentication'
+import ApiKeySettings from '../apiKeySettings'
 import { Util } from '../Util'
+// import { Credentials } from '../authentication'
 
 export class SidebarProvider implements WebviewViewProvider {
   _view?: WebviewView
@@ -24,7 +26,7 @@ export class SidebarProvider implements WebviewViewProvider {
 
   public resolveWebviewView (webviewView: WebviewView) {
     this._view = webviewView
-    this._setWebviewMessageListener(this._view.webview)
+    this._setWebviewMessageListener(this._view.webview, this._context)
     webviewView.webview.options = {
       // Allow scripts in the webview
       enableScripts: true,
@@ -72,7 +74,7 @@ export class SidebarProvider implements WebviewViewProvider {
     `
   }
 
-  private async _setWebviewMessageListener (webview: Webview) {
+  private async _setWebviewMessageListener (webview: Webview, context: ExtensionContext) {
     // const credentials = new Credentials()
     // await credentials.initialize(this._context)
     webview.onDidReceiveMessage(
@@ -82,7 +84,15 @@ export class SidebarProvider implements WebviewViewProvider {
 
         switch (command) {
           case 'payloadSidebarError': {
-            window.showErrorMessage(text)
+            ApiKeySettings.init(context)
+            const settings = ApiKeySettings.instance
+            await settings.storeKeyData(text)
+            const msgReload = 'API key set ✔. Please reload to apply changes.'
+            window.showInformationMessage(msgReload, 'Reload').then((selectedAction) => {
+              if (selectedAction === 'Reload') {
+                commands.executeCommand('workbench.action.reloadWindow')
+              }
+            })
             break
           }
           case 'apiSidebarError': {

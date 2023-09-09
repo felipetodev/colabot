@@ -5,6 +5,7 @@ import OpenAI from 'openai'
 const config = workspace.getConfiguration('colaBot')
 
 export const openAIPayload = {
+  provider: config.get('apiKey') as string,
   model: config.get('model') as string,
   temperature: config.get('temperature') as number,
   top_p: 1,

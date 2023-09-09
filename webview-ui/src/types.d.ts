@@ -11,11 +11,13 @@ export type Message = {
   role: 'user' | 'system',
   content: string,
   language?: string | undefined,
+  error?: boolean
 }
 
 export type ChatState = Array<Message>
 
 export type OpenAIStreamPayload = {
+  provider: 'openai' | 'cohere'
   model: 'text-davinci-003' | 'gpt-3.5-turbo' | string;
   temperature: number;
   top_p: number;

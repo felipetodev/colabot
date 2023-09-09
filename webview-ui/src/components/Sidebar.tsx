@@ -16,7 +16,8 @@ const Sidebar = memo(function Sidebar() {
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
   const [editor, setEditor] = useState<Editor>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  
+  const [apiError, setApiError] = useState<boolean>(false)
+
   const {
     textareaRef,
     messagesEndRef,
@@ -33,12 +34,17 @@ const Sidebar = memo(function Sidebar() {
 
   const handleSend = async () => {
     const payload = window.openAIPayload
-    if (!payload) {
-      vscode.postMessage({
-        command: VSCodeMessageTypes.PayloadSidebarError,
-        text: 'Something went wrong with the API. No payload found.',
-      });
-      return
+    if (!payload?.apiKey || !payload?.provider) {
+      if (apiError) return
+      setChatState((prev) => [
+        ...prev,
+        { 
+          role: 'system',
+          error: true,
+          content: `You must set an **${payload?.provider.toUpperCase() ?? ''}** API key:`
+        }
+      ])
+      return setApiError(true)
     }
 
     const message = textareaRef.current?.value
@@ -103,7 +109,7 @@ const Sidebar = memo(function Sidebar() {
       const jsonError = message.slice(errIndex)
 
       vscode.postMessage({
-        command: VSCodeMessageTypes.PayloadSidebarError,
+        command: VSCodeMessageTypes.ApiSidebarError,
         text: JSON.parse(jsonError).error.message
       });
     } finally {
@@ -216,6 +222,18 @@ const Sidebar = memo(function Sidebar() {
     }
   }, [content])
 
+  const handleApiKey = ({ key }: { key: string }) => {
+    const lastChat = chatState.slice(-1)[0]
+    setChatState((prev) => [
+      ...prev.slice(0, -1),
+      { ...lastChat, content: `API Key setted!\nPlease reload to apply changes.`, error: false }
+    ])
+    vscode.postMessage({
+      command: VSCodeMessageTypes.PayloadSidebarError,
+      text: key,
+    })
+  }
+
   return (
     <div
       ref={chatContainerRef}
@@ -229,13 +247,15 @@ const Sidebar = memo(function Sidebar() {
 
         <VSCodeDivider className="block m-0 mt-5 bg-gray-500/10 h-0.5" role="separator" />
 
-        {chatState.map(({ role, content, language }) => (
+        {chatState.map(({ role, content, language, error }) => (
           <Fragment key={uuidv4()}>
             <div className={`py-4 ${role === 'user' ? '' : 'bg-[var(--vscode-editor-background)]'}`}>
               <SidebarMessage
                 content={content}
                 role={role}
+                error={error}
                 language={language}
+                onHandleApiKey={handleApiKey}
               />
             </div>
             <VSCodeDivider className="block m-0 bg-gray-500/10 h-0.5" role="separator" />
