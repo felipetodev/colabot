@@ -9,7 +9,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.54.0
   '@typescript-eslint/parser': ^5.49.0
   '@vscode/test-electron': ^2.2.2
-  cohere-ai: ^6.0.0
+  cohere-ai: ^6.2.2
   eslint: ^8.0.1
   eslint-config-standard-with-typescript: ^34.0.0
   eslint-plugin-import: ^2.25.2

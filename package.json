@@ -170,7 +170,7 @@
   },
   "dependencies": {
     "@octokit/rest": "19.0.7",
-    "cohere-ai": "^6.0.0",
+    "cohere-ai": "^6.2.2",
     "openai": "^4.5.0"
   },
   "description": "Extension that uses AI to help you code faster",
