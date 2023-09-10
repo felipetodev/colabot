@@ -53,7 +53,6 @@ export async function cohereApi (selectedText: string, apiKey: string) {
     return response.body.summary
   } catch (err) {
     const errorAsAny = err as any
-
-    throw errorAsAny
+    throw errorAsAny.message
   }
 }
