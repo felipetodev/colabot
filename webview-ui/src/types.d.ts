@@ -18,7 +18,7 @@ export type ChatState = Array<Message>
 
 export type OpenAIStreamPayload = {
   provider: 'openai' | 'cohere'
-  model: 'text-davinci-003' | 'gpt-3.5-turbo' | string;
+  model: 'gpt-3.5-turbo' | 'gpt-3.5-turbo-16k' | 'gpt-4' | 'gpt-4-32k' | string;
   temperature: number;
   top_p: number;
   frequency_penalty: number;

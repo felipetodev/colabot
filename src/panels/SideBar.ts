@@ -26,7 +26,7 @@ export class SidebarProvider implements WebviewViewProvider {
 
   public resolveWebviewView (webviewView: WebviewView) {
     this._view = webviewView
-    this._setWebviewMessageListener(this._view.webview, this._context)
+    this._setWebviewMessageListener(this._view.webview)
     webviewView.webview.options = {
       // Allow scripts in the webview
       enableScripts: true,
@@ -74,7 +74,7 @@ export class SidebarProvider implements WebviewViewProvider {
     `
   }
 
-  private async _setWebviewMessageListener (webview: Webview, context: ExtensionContext) {
+  private async _setWebviewMessageListener (webview: Webview) {
     // const credentials = new Credentials()
     // await credentials.initialize(this._context)
     webview.onDidReceiveMessage(
@@ -84,7 +84,7 @@ export class SidebarProvider implements WebviewViewProvider {
 
         switch (command) {
           case 'payloadSidebarError': {
-            ApiKeySettings.init(context)
+            ApiKeySettings.init(this._context)
             const settings = ApiKeySettings.instance
             await settings.storeKeyData(text)
             const msgReload = 'API key set ✔. Please reload to apply changes.'

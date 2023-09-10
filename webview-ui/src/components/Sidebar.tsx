@@ -16,7 +16,6 @@ const Sidebar = memo(function Sidebar() {
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
   const [editor, setEditor] = useState<Editor>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const [apiError, setApiError] = useState<boolean>(false)
 
   const {
     textareaRef,
@@ -35,7 +34,8 @@ const Sidebar = memo(function Sidebar() {
   const handleSend = async () => {
     const payload = window.openAIPayload
     if (!payload?.apiKey || !payload?.provider) {
-      if (apiError) return
+      const isMessageWithError = chatState.slice(-1)[0].error
+      if (isMessageWithError) return
       setChatState((prev) => [
         ...prev,
         { 
@@ -44,7 +44,7 @@ const Sidebar = memo(function Sidebar() {
           content: `You must set an **${payload?.provider.toUpperCase() ?? ''}** API key:`
         }
       ])
-      return setApiError(true)
+      return
     }
 
     const message = textareaRef.current?.value
@@ -121,7 +121,7 @@ const Sidebar = memo(function Sidebar() {
   }
 
   useEffect(() => {
-    // set up listener for selected text from editor
+    // set up webview event listeners
     window.addEventListener('message', async (event) => {
       const { type, editor } = event.data as { type: 'selectedText' | 'clearChat', editor: Editor }
       if (type === 'selectedText') {
