@@ -67,6 +67,11 @@ const SidebarMessage = memo(function SidebarMessage({
                     </code>
                     )
               },
+              li ({ node, ...props }) {
+                return (
+                  <li className='flex' {...props} />
+                )
+              }
             }}
           >
             {content}
