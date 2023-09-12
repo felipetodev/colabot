@@ -95,7 +95,7 @@ export async function LangChainStream (
   });
 
   if (prompt.startsWith('/')) {
-    prompt = commands[prompt as '/explain' | '/test' | '/fix' | '/doc']
+    prompt = commands[prompt as keyof typeof commands]
   }
 
   const result = await chain.call({
