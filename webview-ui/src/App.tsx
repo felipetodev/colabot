@@ -13,7 +13,7 @@ function App() {
   const handleSend = async (message: string) => {
     const payload = window.openAIPayload
     if (!payload?.apiKey) {
-      const isMessageWithError = chatState.slice(-1)[0].error
+      const isMessageWithError = chatState.slice(-1)[0]?.error
       if (isMessageWithError) return
       setChatState((prev) => [
         ...prev,
