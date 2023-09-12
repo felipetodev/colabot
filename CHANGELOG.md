@@ -48,3 +48,13 @@ All notable changes to the "colabot" extension will be documented in this file.
 - Add OpenAI models and organization
 - Add input expand Y axis while typing
 - Update OpenAI Node API Library
+
+## 2.0.0
+
+### Major Changes
+
+- Remove CoHere provider
+- Remove old webview for olds editor commands
+- Add new shortcuts commands in Sidebar Chat (fix, test, docs, explain)
+- Fix Sidebar Chat styles and improve UI
+- Refact all webview-ui components

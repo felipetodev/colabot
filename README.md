@@ -4,13 +4,11 @@
 
 ## Features
 
-- Ask ColaBOT: Ask ColaBOT questions about your code and get instant answers.
-- Explain ColaBOT: Get explanations for complex concepts and programming terms.
-- Get Code: Generate code snippets based on your input.
+- ColaBOT Chat (NEW UI ✨✨✨).
+- ColaBOT Chat shortcuts commands: Explain code, Fix code, Docs generator & Test generator (NEW ✨✨✨).
 - Set API Key: Set your API key for ColaBOT.
 - Remove API Key: Remove your API key for ColaBOT.
-- AI Commit: Use AI to commit your code changes.
-- Sidebar chat for interacting with ColaBOT. (NEW ✨)
+- AI Commits: Use AI to commit your code changes.
 
 ## Requirements
 
@@ -26,53 +24,30 @@
 
 ## Usage
 
-To use ColaBOT, you must first set your API key. To do this, press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Set API Key". Then, select your AI provider (OpenAI or Cohere) and enter your API key.
+To use ColaBOT, you must first set your API key. To do this, press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Set API Key" in the command palette to set your OpenAI API key (completely safe and secure).
 
-Once your API key is set, you can use the following commands:
+Once your API key is set, you can start using the next features:
 
-## Get Code
+## ColaBOT Chat (NEW ✨)
 
-- Get Code: Press `Ctrl+Shift+I` to generate code snippets based on your input.
-- Keep your cursor at the end of the same comment line.
+- ColaBOT Chat tool allows you to quickly resolve any doubts related to programming or other topics while working on your code.
 
-![](./assets/getCode.gif)
+## Shortcuts (Explain, Fix, Docs, Test)
 
-## Ask Code
+- When selecting code and right-clicking on the selection, you can access shortcuts that will help you quickly execute the functionality you need and get a response in your ColBOT Chat.
 
-- Ask ColaBOT: Press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Ask ColaBOT". Then, enter your question and press Enter to get an answer.
-
-![](./assets/askCode.gif)
-
-
-## Ask Code Selected
-
-- Ask ColaBOT with code selection: With Right click in your selection you are able to ask something with that selection as context.
-
-![](./assets/askCodeSelected.gif)
-
-## Explain Code
-
-- Explain ColaBOT: With Right click in your selection code or Press `Ctrl+Shift+P` to open the Command Palette, and search for "ColaBOT: Explain ColaBOT". This will return an explanation of what that specific code selection does.
-
-![](./assets/explainCode.gif)
-
-## AI Commits (NEW ✨)
+## AI Commits
 
 - To use AI to commit your code, run the "AI Commit" command (under the "ColaBOT (Git)" category). ColaBOT will generate a commit message using AI, and you can choose whether to use gitmoji and/or semantic versioning in your commit.
 
 ![](./assets/aiCommits.gif)
 
-## Sidebar Chat (NEW ✨)
-
-- ColaBOT Chat tool allows you to quickly resolve any doubts related to programming or other topics while working on your code.
-
-![](./assets/sidebarChat.gif)
-
 ## Configuration
 
 You can configure ColaBOT by going to File > Preferences > Settings, and searching for "ColaBOT". Here, you can set the following options:
 
-- API Key: Set your API key and IA provider for ColaBOT.
+- API Key: Set your API key and IA provider for ColaBOT (default: OpenAI).
+- Organization ID: Set your organization ID for OpenAI models that require it (NEW ✨✨✨).
 - Model: The model to use for ColaBOT.
 - Max Tokens: The maximum number of tokens to generate.
 - Temperature: The temperature of the model (between 0 and 1).
