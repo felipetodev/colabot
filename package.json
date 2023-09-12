@@ -17,11 +17,6 @@
     "commands": [
       {
         "category": "ColaBOT",
-        "command": "colabot-vscode.getCode",
-        "title": "Get Code"
-      },
-      {
-        "category": "ColaBOT",
         "command": "colabot-vscode.setApiKey",
         "title": "Set API Key"
       },
@@ -32,13 +27,23 @@
       },
       {
         "category": "ColaBOT",
-        "command": "colabot-vscode.askCode",
-        "title": "Ask ColaBOT"
+        "command": "colabot-vscode.docsCode",
+        "title": "Generate Docs ColaBOT"
+      },
+      {
+        "category": "ColaBOT",
+        "command": "colabot-vscode.fixCode",
+        "title": "Fix This ColaBOT"
+      },
+      {
+        "category": "ColaBOT",
+        "command": "colabot-vscode.testCode",
+        "title": "Generate Test ColaBOT"
       },
       {
         "category": "ColaBOT",
         "command": "colabot-vscode.explainCode",
-        "title": "Explain ColaBOT"
+        "title": "Explain This ColaBOT"
       },
       {
         "category": "ColaBOT (Git)",
@@ -62,8 +67,7 @@
           "default": "openai",
           "description": "To use ColaBOT press (ctrl+shift+p) and search for 'ColaBOT: Set API Key'. then select your AI provider:",
           "enum": [
-            "openai",
-            "cohere"
+            "openai"
           ],
           "order": 1,
           "type": "string"
@@ -87,9 +91,7 @@
             "gpt-3.5-turbo",
             "gpt-3.5-turbo-16k",
             "gpt-4",
-            "gpt-4-32k",
-            "command-xlarge-nightly",
-            "summarize-xlarge"
+            "gpt-4-32k"
           ],
           "order": 2,
           "type": "string"
@@ -115,18 +117,19 @@
       "title": "ColaBOT 🤖",
       "type": "object"
     },
-    "keybindings": [
-      {
-        "command": "colabot-vscode.getCode",
-        "key": "ctrl+shift+i",
-        "mac": "cmd+shift+i",
-        "when": "editorTextFocus"
-      }
-    ],
+    "keybindings": [],
     "menus": {
       "editor/context": [
         {
-          "command": "colabot-vscode.askCode",
+          "command": "colabot-vscode.fixCode",
+          "group": "colabot_commands"
+        },
+        {
+          "command": "colabot-vscode.testCode",
+          "group": "colabot_commands"
+        },
+        {
+          "command": "colabot-vscode.docsCode",
           "group": "colabot_commands"
         },
         {
