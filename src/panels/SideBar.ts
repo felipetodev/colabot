@@ -1,5 +1,6 @@
 import {
   env,
+  Uri,
   window,
   commands,
   workspace,
@@ -7,8 +8,7 @@ import {
   type Webview,
   type WebviewViewProvider,
   type WebviewView,
-  type TextDocument,
-  type Uri
+  type TextDocument
 } from 'vscode'
 import { openAIPayload } from '../OpenAI'
 import { getNonce, getUri } from './utils'
@@ -17,6 +17,7 @@ import { Util } from '../Util'
 // import { Credentials } from '../authentication'
 
 export class SidebarProvider implements WebviewViewProvider {
+  public static readonly viewType = 'colabot-sidebar'
   _view?: WebviewView
   _doc?: TextDocument
   _apiKey: string
@@ -30,8 +31,11 @@ export class SidebarProvider implements WebviewViewProvider {
     webviewView.webview.options = {
       // Allow scripts in the webview
       enableScripts: true,
-
-      localResourceRoots: [this._context.extensionUri]
+      // Restrict the webview to only load resources from the `out` and `webview-ui/build` directories
+      localResourceRoots: [
+        Uri.joinPath(this._context.extensionUri, 'out'),
+        Uri.joinPath(this._context.extensionUri, 'webview-ui/build')
+      ]
     }
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview, this._context.extensionUri)
@@ -60,7 +64,6 @@ export class SidebarProvider implements WebviewViewProvider {
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
           <title>ColaBOT: AI assistant 🤖</title>
           <script nonce="${nonce}">
-            window.sidebar = ${JSON.stringify(true)};
             window.openAIPayload = ${JSON.stringify({ ...openAIPayload, apiKey: this._apiKey })};
             window.currentTheme = ${JSON.stringify(currentTheme)};
             window.accessToken = ${JSON.stringify(Util.getAccessToken())};
