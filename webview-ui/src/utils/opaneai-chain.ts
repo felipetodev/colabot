@@ -8,13 +8,20 @@ import { LLMChain } from "langchain/chains";
 
 import { type ChatState, OpenAIStreamPayload } from "../types"
 
+const commands = {
+  '/explain': 'Explain the following code snippet:',
+  '/test': 'Generate test for the following code snippet, give me an example based on the following prompt:',
+  '/fix': 'Fix (or try to refact) the following code snippet:',
+  '/doc': 'Generate documentation for the following code snippet:'
+}
+
 export async function LangChainStream (
   chatUpdate: ChatState,
   selectedText: string,
   vsCodePayload: OpenAIStreamPayload,
   cb: any
 ) {
-  const prompt = chatUpdate.slice(-1)[0].content
+  let prompt = chatUpdate.slice(-1)[0].content
   const chatHistory = chatUpdate
     ? chatUpdate
       .map(({ role, content }) => {
@@ -86,6 +93,10 @@ export async function LangChainStream (
     prompt: chatPrompt,
     llm: chat,
   });
+
+  if (prompt.startsWith('/')) {
+    prompt = commands[prompt as '/explain' | '/test' | '/fix' | '/doc']
+  }
 
   const result = await chain.call({
     question: prompt,
