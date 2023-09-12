@@ -1,6 +1,6 @@
 import { window } from 'vscode'
 import { gitCommit } from './'
-import { COMMIT_TYPES } from './commit-types'
+import { COMMIT_TYPES } from '../lib/constants'
 
 export function commitTypesOpts (withGitmoji: boolean, withSemVer: boolean) {
   if (withSemVer) {

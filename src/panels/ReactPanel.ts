@@ -1,5 +1,5 @@
 import { type Disposable, type Webview, type WebviewPanel, window, Uri, ViewColumn, env } from 'vscode'
-import { getUri, getNonce } from './utils'
+import { getUri, getNonce } from '../lib/utils'
 
 /**
  * This class manages the state and behavior of HelloWorld webview panels.

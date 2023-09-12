@@ -1,61 +1,20 @@
 import * as vscode from 'vscode'
-import { OpenAIStream } from './OpenAI'
 import ApiKeySettings from './apiKeySettings'
 import { generateCommitMessage } from './git/iacommit'
 import { commitTypesOpts, getCommitTypeObject, releaseCommit } from './git/utils'
-import { COMMIT_TYPES } from './git/commit-types'
+import { COMMIT_TYPES } from './lib/constants'
 import { SidebarProvider } from './panels/SideBar'
 import { Util } from './Util'
-
-const AI_INTELLISENSE = {
-  openai: OpenAIStream
-  // cohere: cohereApi
-}
-
-const progressOptions: vscode.ProgressOptions = {
-  location: vscode.ProgressLocation.Notification,
-  title: 'ColaBOT',
-  cancellable: true
-}
-
-const triggerCommand = async (sidebarProvider: SidebarProvider, command: 'fix' | 'explain' | 'doc' | 'test') => {
-  vscode.commands.executeCommand('workbench.view.extension.colabot-sidebar-chat')
-
-  const editor = vscode.window.activeTextEditor
-  const selection = editor?.selection
-  const selectedText = editor?.document?.getText(selection).trim()
-  if (!selectedText) {
-    return await vscode.window.showWarningMessage('Please select some text first')
-  }
-
-  sidebarProvider._view?.webview.postMessage({
-    type: 'selectedText',
-    editor: {
-      selectedText,
-      prompt: command,
-      language: editor?.document.languageId
-    }
-  })
-}
+import { getApiResponse, triggerCommand } from './lib/utils'
 
 export async function activate (context: vscode.ExtensionContext) {
   Util.globalState = context.globalState
   ApiKeySettings.init(context)
   const settings = ApiKeySettings.instance
-  const API_KEY = await settings.getKeyData()
+  const apiKey = await settings.getKeyData()
 
-  const config = vscode.workspace.getConfiguration('colaBot')
-  const llmProvider = config.get('apiKey') as 'openai'
+  const sidebarProvider = new SidebarProvider(context, apiKey!)
 
-  const getApiResponse = async (comment: string) => {
-    return await vscode.window.withProgress(progressOptions, async (progress) => {
-      progress.report({ message: 'Loading...' })
-
-      return await AI_INTELLISENSE[llmProvider](comment, API_KEY)
-    })
-  }
-
-  const sidebarProvider = new SidebarProvider(context, API_KEY!)
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       SidebarProvider.viewType,
@@ -92,6 +51,7 @@ export async function activate (context: vscode.ExtensionContext) {
   )
 
   vscode.commands.registerCommand('colabot-vscode.aiCommit', async () => {
+    const config = vscode.workspace.getConfiguration('colaBot')
     const withGitmoji = config.get('gitMoji') as boolean
     const withSemVer = config.get('semanticVersioningSpecification') as boolean
     const commitOptions = commitTypesOpts(withGitmoji, withSemVer)
@@ -109,7 +69,7 @@ export async function activate (context: vscode.ExtensionContext) {
             const promptMessage = await generateCommitMessage(withSemVer)
             if (promptMessage) {
               try {
-                aiCommitMessage = await getApiResponse(promptMessage)
+                aiCommitMessage = await getApiResponse(promptMessage, apiKey!)
               } catch (err) {
                 vscode.window.showErrorMessage(err as any)
               }

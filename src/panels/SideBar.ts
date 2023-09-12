@@ -11,7 +11,7 @@ import {
   type TextDocument
 } from 'vscode'
 import { openAIPayload } from '../OpenAI'
-import { getNonce, getUri } from './utils'
+import { getNonce, getUri } from '../lib/utils'
 import ApiKeySettings from '../apiKeySettings'
 import { Util } from '../Util'
 // import { Credentials } from '../authentication'
