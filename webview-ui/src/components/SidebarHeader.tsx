@@ -1,9 +1,9 @@
 import { vscode } from "../utils/vscode"
 import { VSCodeLink } from "@vscode/webview-ui-toolkit/react"
-import { VSCodeMessageTypes } from "../types.d"
+import { VSCodeMessageTypes } from "../types"
 
 type Props = {
-  onUpdateConversation: (type: 'EXPLAIN' | 'FIX' | 'TEST') => void
+  onUpdateConversation: (type: { type: 'explain' | 'fix' | 'test' }) => void
 }
 
 export default function SidebarHeader({
@@ -30,13 +30,13 @@ export default function SidebarHeader({
         <p>You can ask generic questions, but what I'm really good at is helping you with your code. For example:</p>
         <div className="flex flex-col gap-2">
           <p>
-            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation('TEST')} className="font-bold">Generate unit tests of my code.</VSCodeLink>
+            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation({ type: 'test' })} className="font-bold">Generate unit tests of my code.</VSCodeLink>
           </p>
           <p>
-            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation('EXPLAIN')} className="font-bold">Explain the selected code.</VSCodeLink>
+            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation({ type: 'explain' })} className="font-bold">Explain the selected code.</VSCodeLink>
           </p>
           <p>
-            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation('FIX')} className="font-bold">Propose a fix for the bugs in my code.</VSCodeLink>
+            ✨ <VSCodeLink onMouseOver={getSelectedText} onClick={() => onUpdateConversation({ type: 'fix' })} className="font-bold">Propose a fix for the bugs in my code.</VSCodeLink>
           </p>
         </div>
         <p>
