@@ -1,6 +1,6 @@
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 import { vscode } from "../utils/vscode";
-import { VSCodeMessageTypes } from "../types.d";
+import { VSCodeMessageTypes } from "../types";
 
 export default function Clipboard({ content }: { content?: string }) {
   const handleCopyClipboard = () => {

@@ -17,7 +17,7 @@ export type Message = {
 export type ChatState = Array<Message>
 
 export type OpenAIStreamPayload = {
-  provider: 'openai' | 'cohere'
+  provider: 'openai';
   model: 'gpt-3.5-turbo' | 'gpt-3.5-turbo-16k' | 'gpt-4' | 'gpt-4-32k' | string;
   temperature: number;
   top_p: number;
@@ -33,6 +33,7 @@ export type OpenAIStreamPayload = {
 export type Editor = {
   selectedText: string
   language: string
+  prompt?: 'explain' | 'fix' | 'test'
 } | null
 
 export enum VSCodeMessageTypes {

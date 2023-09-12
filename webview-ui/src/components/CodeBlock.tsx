@@ -1,7 +1,7 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { vscode } from "../utils/vscode";
-import { VSCodeMessageTypes } from '../types.d';
+import { VSCodeMessageTypes } from '../types';
 
 type Props = {
   language: string;

@@ -1,5 +1,5 @@
 import { VSCodeButton } from '@vscode/webview-ui-toolkit/react';
-import { VSCodeMessageTypes } from '../types.d';
+import { VSCodeMessageTypes } from '../types';
 import { vscode } from '../utils/vscode';
 import Clipboard from './Clipboard';
 
