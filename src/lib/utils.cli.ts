@@ -24,18 +24,22 @@ export async function getChangedFiles () {
 export async function getStagedDiff (): Promise<{ files: string[], diff: string }> {
   const diffCached = 'diff --cached'
 
-  const { stdout: files } = await exec(
+  try {
+    const { stdout: files } = await exec(
     `git ${diffCached} --name-only ${excludeFromDiff.join(' ')}`,
     { cwd: getWorkspaceFolder() }
-  )
+    )
 
-  const { stdout: diff } = await exec(`git ${diffCached} ${excludeFromDiff.join(' ')}`, {
-    cwd: getWorkspaceFolder()
-  })
+    const { stdout: diff } = await exec(`git ${diffCached} ${excludeFromDiff.join(' ')}`, {
+      cwd: getWorkspaceFolder()
+    })
 
-  return {
-    files: cleanStdout(files),
-    diff
+    return {
+      files: cleanStdout(files),
+      diff
+    }
+  } catch (error) {
+    return { files: [], diff: '' }
   }
 }
 
