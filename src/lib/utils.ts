@@ -36,6 +36,8 @@ export const getApiResponse = async (comment: string, apiKey: string) => {
 export const triggerCommand = async (sidebarProvider: SidebarProvider, command: 'fix' | 'explain' | 'doc' | 'test') => {
   if (!sidebarProvider._view) {
     await commands.executeCommand('colabot-sidebar.focus')
+    // wait till sidebar is ready. TODO: find a better way to improve this
+    await new Promise((resolve) => setTimeout(resolve, 500))
   } else {
     sidebarProvider._view?.show?.(true)
   }
