@@ -38,12 +38,11 @@ const Chat = memo(({
   }, [chatState.length, throttledScrollDown])
 
   return (
-    <div
-      ref={chatContainerRef}
-      onScroll={handleScroll}
-      className="h-full min-h-screen flex flex-col"
-    >
-      <div>
+    <div className="h-full min-h-screen flex flex-col">
+      <div
+        ref={chatContainerRef}
+        onScroll={handleScroll}
+      >
         <SidebarHeader
           onUpdateConversation={handleSendCommand}
         />
@@ -69,7 +68,10 @@ const Chat = memo(({
       <ChatInput
         textareaRef={textareaRef}
         loading={loading}
-        onSend={handleSend}
+        onSend={(message) => {
+          messagesEndRef.current?.scrollIntoView(true)
+          handleSend(message)
+        }}
       />
     </div>
   )
