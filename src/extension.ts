@@ -1,9 +1,5 @@
 import * as vscode from 'vscode'
-import { Panel } from './panels/ReactPanel'
 import { OpenAIStream } from './OpenAI'
-import { cohereApi } from './CohereAI'
-import { languageSupportsComments, parseLineComment } from './consts/comments'
-import { replaceWithUnicodes } from './panels/utils'
 import ApiKeySettings from './apiKeySettings'
 import { generateCommitMessage } from './git/iacommit'
 import { commitTypesOpts, getCommitTypeObject, releaseCommit } from './git/utils'
@@ -12,14 +8,34 @@ import { SidebarProvider } from './panels/SideBar'
 import { Util } from './Util'
 
 const AI_INTELLISENSE = {
-  openai: OpenAIStream,
-  cohere: cohereApi
+  openai: OpenAIStream
+  // cohere: cohereApi
 }
 
 const progressOptions: vscode.ProgressOptions = {
   location: vscode.ProgressLocation.Notification,
   title: 'ColaBOT',
   cancellable: true
+}
+
+const triggerCommand = async (sidebarProvider: SidebarProvider, command: 'fix' | 'explain' | 'doc' | 'test') => {
+  vscode.commands.executeCommand('workbench.view.extension.colabot-sidebar-chat')
+
+  const editor = vscode.window.activeTextEditor
+  const selection = editor?.selection
+  const selectedText = editor?.document?.getText(selection).trim()
+  if (!selectedText) {
+    return await vscode.window.showWarningMessage('Please select some text first')
+  }
+
+  sidebarProvider._view?.webview.postMessage({
+    type: 'selectedText',
+    editor: {
+      selectedText,
+      prompt: command,
+      language: editor?.document.languageId
+    }
+  })
 }
 
 export async function activate (context: vscode.ExtensionContext) {
@@ -29,22 +45,50 @@ export async function activate (context: vscode.ExtensionContext) {
   const API_KEY = await settings.getKeyData()
 
   const config = vscode.workspace.getConfiguration('colaBot')
-  const intellisenseSelected = config.get('apiKey') as keyof typeof AI_INTELLISENSE
+  const llmProvider = config.get('apiKey') as 'openai'
 
   const getApiResponse = async (comment: string) => {
     return await vscode.window.withProgress(progressOptions, async (progress) => {
       progress.report({ message: 'Loading...' })
 
-      return await AI_INTELLISENSE[intellisenseSelected](comment, API_KEY!)
+      return await AI_INTELLISENSE[llmProvider](comment, API_KEY)
     })
   }
 
   const sidebarProvider = new SidebarProvider(context, API_KEY!)
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
-      'colabot-sidebar',
-      sidebarProvider
+      SidebarProvider.viewType,
+      sidebarProvider,
+      {
+        webviewOptions: {
+          retainContextWhenHidden: true
+        }
+      }
     )
+  )
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('colabot-vscode.fixCode', () => {
+      triggerCommand(sidebarProvider, 'fix')
+    }),
+    vscode.commands.registerCommand('colabot-vscode.docsCode', () => {
+      triggerCommand(sidebarProvider, 'doc')
+    }),
+    vscode.commands.registerCommand('colabot-vscode.testCode', () => {
+      triggerCommand(sidebarProvider, 'test')
+    }),
+    vscode.commands.registerCommand('colabot-vscode.explainCode', () => {
+      triggerCommand(sidebarProvider, 'explain')
+    }),
+    vscode.commands.registerCommand('colabot-vscode.clearChat', () => {
+      sidebarProvider._view?.webview.postMessage({
+        type: 'clearChat'
+      })
+    }),
+    vscode.commands.registerCommand('colabot-vscode.chatFeedback', () => {
+      vscode.env.openExternal(vscode.Uri.parse('https://github.com/felipetodev/colabot/issues'))
+    })
   )
 
   vscode.commands.registerCommand('colabot-vscode.aiCommit', async () => {
@@ -143,104 +187,6 @@ export async function activate (context: vscode.ExtensionContext) {
       }
     })
   })
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('colabot-vscode.getCode', async () => {
-      const editor = vscode.window.activeTextEditor
-      if (!editor) {
-        return await vscode.window.showErrorMessage('Select code')
-      }
-      const lang = editor.document.languageId
-      const isLanguageSupported = languageSupportsComments(lang)
-
-      if (!isLanguageSupported) {
-        return await vscode.window.showErrorMessage('Language not supported')
-      }
-
-      const position = editor.selection.active
-      const currentLine = editor.document.lineAt(position)
-
-      const comment = `${parseLineComment(currentLine.text, lang)!} for ${lang}`
-
-      try {
-        const response = await getApiResponse(comment)
-        if (response) Panel.render(context.extensionUri, response)
-      } catch (err) {
-        vscode.window.showErrorMessage(err as any)
-      }
-    })
-  )
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('colabot-vscode.askCode', async () => {
-      const editor = vscode.window.activeTextEditor
-      let askWithCodeSelection = ''
-      if (editor) {
-        const selection = editor.selection
-        const selectedText = editor.document.getText(selection)
-        // validate selection and selection length
-        if (selectedText && !selectedText.trim()) {
-          return await vscode.window.showWarningMessage('Please do a better selection')
-        }
-        if (selectedText) {
-          askWithCodeSelection = selectedText
-        }
-      }
-      vscode.window
-        .showInputBox({
-          placeHolder: 'Ask me anything 🤖'
-        })
-        .then(async (value) => {
-          if (!value) return
-
-          if (value.trim().length < 8) {
-            return await vscode.window.showWarningMessage('Please give some more information')
-          }
-          try {
-            if (askWithCodeSelection) {
-              value = `${askWithCodeSelection}\n\n${value}:`
-            }
-            const response = await getApiResponse(value)
-            if (response) Panel.render(context.extensionUri, replaceWithUnicodes(response))
-          } catch (err) {
-            vscode.window.showErrorMessage(err as any)
-          }
-        })
-    })
-  )
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('colabot-vscode.explainCode', async () => {
-      const editor = vscode.window.activeTextEditor
-      const selection = editor?.selection
-      const selectedText = editor?.document?.getText(selection)
-      if (!selectedText) {
-        return await vscode.window.showWarningMessage('Please select some text first')
-      }
-
-      try {
-        const message = `${selectedText}. Explain how this code works:`
-        const response = await getApiResponse(message)
-        if (response) Panel.render(context.extensionUri, response)
-      } catch (err) {
-        vscode.window.showErrorMessage(err as any)
-      }
-    })
-  )
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('colabot-vscode.clearChat', async () => {
-      sidebarProvider._view?.webview.postMessage({
-        type: 'clearChat'
-      })
-    })
-  )
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand('colabot-vscode.chatFeedback', async () => {
-      vscode.env.openExternal(vscode.Uri.parse('https://github.com/felipetodev/colabot/issues'))
-    })
-  )
 }
 
 // This method is called when your extension is deactivated
