@@ -2,7 +2,6 @@ import {
   env,
   Uri,
   window,
-  commands,
   workspace,
   type ExtensionContext,
   type Webview,
@@ -11,7 +10,7 @@ import {
   type TextDocument
 } from 'vscode'
 import { openAIPayload } from '../OpenAI'
-import { getNonce, getUri } from '../lib/utils'
+import { execReloadWindow, getNonce, getUri } from '../lib/utils'
 import ApiKeySettings from '../apiKeySettings'
 import { Util } from '../Util'
 // import { Credentials } from '../authentication'
@@ -90,12 +89,7 @@ export class SidebarProvider implements WebviewViewProvider {
             ApiKeySettings.init(this._context)
             const settings = ApiKeySettings.instance
             await settings.storeKeyData(text)
-            const msgReload = 'API key set ✔. Please reload to apply changes.'
-            window.showInformationMessage(msgReload, 'Reload').then((selectedAction) => {
-              if (selectedAction === 'Reload') {
-                commands.executeCommand('workbench.action.reloadWindow')
-              }
-            })
+            execReloadWindow('API key set ✔. Please reload to apply changes.')
             break
           }
           case 'apiSidebarError': {

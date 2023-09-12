@@ -33,6 +33,15 @@ export const getApiResponse = async (comment: string, apiKey: string) => {
   })
 }
 
+export const execReloadWindow = async (message: string) => {
+  const action = 'Reload'
+  window.showInformationMessage(message, action).then((selectedAction) => {
+    if (selectedAction === action) {
+      commands.executeCommand('workbench.action.reloadWindow')
+    }
+  })
+}
+
 export const triggerCommand = async (sidebarProvider: SidebarProvider, command: 'fix' | 'explain' | 'doc' | 'test') => {
   if (!sidebarProvider._view) {
     await commands.executeCommand('colabot-sidebar.focus')

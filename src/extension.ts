@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import ApiKeySettings from './apiKeySettings'
 import { SidebarProvider } from './panels/SideBar'
 import { Util } from './Util'
-import { triggerCommand } from './lib/utils'
+import { execReloadWindow, triggerCommand } from './lib/utils'
 import { aiCommits } from './aicommits/commands'
 
 export async function activate (context: vscode.ExtensionContext) {
@@ -55,24 +55,12 @@ export async function activate (context: vscode.ExtensionContext) {
     if (!tokenInput) return
 
     await settings.storeKeyData(tokenInput)
-    const action = 'Reload'
-    const msgReload = 'API key set ✔. Please reload to apply changes.'
-    vscode.window.showInformationMessage(msgReload, action).then((selectedAction) => {
-      if (selectedAction === action) {
-        vscode.commands.executeCommand('workbench.action.reloadWindow')
-      }
-    })
+    execReloadWindow('API key set ✔. Please reload to apply changes.')
   })
 
   vscode.commands.registerCommand('colabot-vscode.removeApiKey', async () => {
     await settings.deleteKeyData()
-    const action = 'Reload'
-    const msgReload = 'API key removed. Please reload to apply changes.'
-    vscode.window.showInformationMessage(msgReload, action).then((selectedAction) => {
-      if (selectedAction === action) {
-        vscode.commands.executeCommand('workbench.action.reloadWindow')
-      }
-    })
+    execReloadWindow('API key removed. Please reload to apply changes.')
   })
 
   // AI commits command
