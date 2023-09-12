@@ -65,7 +65,7 @@
       "properties": {
         "colaBot.apiKey": {
           "default": "openai",
-          "description": "To use ColaBOT press (ctrl+shift+p) and search for 'ColaBOT: Set API Key'. then select your AI provider:",
+          "description": "To use ColaBOT, press (ctrl+shift+p) and search for 'ColaBOT: Set API Key' in the command palette to set your OpenAI API key.",
           "enum": [
             "openai"
           ],
