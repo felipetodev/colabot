@@ -45,6 +45,11 @@ export async function activate (context: vscode.ExtensionContext) {
     }),
     vscode.commands.registerCommand('colabot-vscode.chatFeedback', () => {
       vscode.env.openExternal(vscode.Uri.parse('https://github.com/felipetodev/colabot/issues'))
+    }),
+    vscode.commands.registerCommand('colabot-vscode.removeApiKeySidebar', async () => {
+      if (!apiKey) return
+      await settings.deleteKeyData()
+      execReloadWindow('API key removed. Please reload to apply changes.')
     })
   )
 

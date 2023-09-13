@@ -59,6 +59,11 @@
         "command": "colabot-vscode.chatFeedback",
         "icon": "$(feedback)",
         "title": "Send Chat Feedback"
+      },
+      {
+        "command": "colabot-vscode.removeApiKeySidebar",
+        "icon": "$(more)",
+        "title": "Remove API Key"
       }
     ],
     "configuration": {
@@ -147,6 +152,11 @@
           "command": "colabot-vscode.clearChat",
           "group": "navigation@1",
           "when": "view == colabot-sidebar"
+        },
+        {
+          "command": "colabot-vscode.removeApiKeySidebar",
+          "group": "more@3",
+          "when": "view == colabot-sidebar"
         }
       ]
     },
@@ -217,5 +227,5 @@
     "vscode:prepublish": "pnpm run compile",
     "watch": "tsc -watch -p ./"
   },
-  "version": "2.0.1"
+  "version": "2.0.2"
 }
