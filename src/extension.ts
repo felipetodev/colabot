@@ -11,7 +11,17 @@ export async function activate (context: vscode.ExtensionContext) {
   const settings = ApiKeySettings.instance
   const apiKey = await settings.getKeyData()
 
-  const sidebarProvider = new SidebarProvider(context, apiKey!)
+  const sidebarProvider = new SidebarProvider(context)
+
+  const config = vscode.workspace.getConfiguration('colaBot')
+
+  sidebarProvider.setSettings({
+    apiKey: apiKey!,
+    model: config.get('model') as string,
+    temperature: config.get('temperature') as number,
+    max_tokens: config.get('maxTokens') as number,
+    organizationId: config.get('organizationId') as string
+  })
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
@@ -49,7 +59,9 @@ export async function activate (context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('colabot-vscode.removeApiKeySidebar', async () => {
       if (!apiKey) return
       await settings.deleteKeyData()
-      execReloadWindow('API key removed. Please reload to apply changes.')
+      sidebarProvider.setSettings({ apiKey: '' })
+      sidebarProvider.updateLLMSettings()
+      vscode.window.showInformationMessage('API key removed successfully.')
     })
   )
 
@@ -69,7 +81,27 @@ export async function activate (context: vscode.ExtensionContext) {
   })
 
   // AI commits command
-  vscode.commands.registerCommand('colabot-vscode.aiCommit', () => { aiCommits(apiKey!) })
+  vscode.commands.registerCommand('colabot-vscode.aiCommit', () => {
+    aiCommits({ settings: sidebarProvider.getSettings() })
+  })
+
+  vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
+    if (event.affectsConfiguration('colaBot.organizationId')) {
+      const config = vscode.workspace.getConfiguration('colaBot')
+      sidebarProvider.setSettings({ organizationId: config.get('organizationId') })
+    } else if (event.affectsConfiguration('colaBot.model')) {
+      const config = vscode.workspace.getConfiguration('colaBot')
+      sidebarProvider.setSettings({ model: config.get('model') })
+    } else if (event.affectsConfiguration('colaBot.temperature')) {
+      const config = vscode.workspace.getConfiguration('colaBot')
+      sidebarProvider.setSettings({ temperature: config.get('temperature') })
+    } else if (event.affectsConfiguration('colaBot.maxTokens')) {
+      const config = vscode.workspace.getConfiguration('colaBot')
+      sidebarProvider.setSettings({ max_tokens: config.get('maxTokens') })
+    }
+
+    sidebarProvider.updateLLMSettings()
+  })
 }
 
 // This method is called when your extension is deactivated

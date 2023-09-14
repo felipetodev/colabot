@@ -1,41 +1,25 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { workspace } from 'vscode'
 import OpenAI from 'openai'
+import { type Settings } from './types'
 
-const config = workspace.getConfiguration('colaBot')
-
-export const openAIPayload = {
-  provider: config.get('apiKey') as string,
-  model: config.get('model') as string,
-  temperature: config.get('temperature') as number,
-  top_p: 1,
-  frequency_penalty: 0,
-  presence_penalty: 0,
-  max_tokens: config.get('maxTokens') as number,
-  stream: false,
-  n: 1,
-  organizationId: config.get('organizationId') as string
-}
-
-export async function OpenAIStream (selectedText: string, apiKey: string = ''): Promise<string> {
+export async function OpenAIStream (selectedText: string, llmSettings: Settings): Promise<string> {
   const openai = new OpenAI({
-    apiKey,
-    ...openAIPayload.organizationId
-      ? { organization: openAIPayload.organizationId }
+    apiKey: llmSettings.apiKey,
+    ...llmSettings.organizationId
+      ? { organization: llmSettings.organizationId }
       : {}
   })
 
   try {
     const completion = await openai.chat.completions.create({
       messages: [{ role: 'user', content: selectedText }],
-      model: openAIPayload.model,
-      temperature: openAIPayload.temperature,
-      top_p: 1,
+      model: llmSettings.model ?? 'gpt-3.5-turbo',
+      temperature: llmSettings.temperature,
+      top_p: llmSettings.top_p,
       stream: false,
-      max_tokens: openAIPayload.max_tokens,
-      frequency_penalty: openAIPayload.frequency_penalty,
-      presence_penalty: openAIPayload.presence_penalty,
-      n: 1
+      max_tokens: llmSettings.max_tokens,
+      frequency_penalty: llmSettings.frequency_penalty,
+      presence_penalty: llmSettings.presence_penalty,
+      n: llmSettings.n
     })
 
     return completion.choices[0].message.content!

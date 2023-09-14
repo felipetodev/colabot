@@ -6,22 +6,47 @@ import {
   type ExtensionContext,
   type Webview,
   type WebviewViewProvider,
-  type WebviewView,
-  type TextDocument
+  type WebviewView
 } from 'vscode'
-import { openAIPayload } from '../OpenAI'
-import { execReloadWindow, getNonce, getUri } from '../lib/utils'
+import { getNonce, getUri } from '../lib/utils'
 import ApiKeySettings from '../apiKeySettings'
 import { Util } from '../Util'
+import { type Settings } from '../types'
 // import { Credentials } from '../authentication'
 
 export class SidebarProvider implements WebviewViewProvider {
   public static readonly viewType = 'colabot-sidebar'
   _view?: WebviewView
-  _doc?: TextDocument
-  _apiKey: string
-  constructor (private readonly _context: ExtensionContext, apiKey: string) {
-    this._apiKey = apiKey
+  private _settings: Settings = {
+    apiKey: '',
+    top_p: 1,
+    max_tokens: 150,
+    model: 'gpt-3.5-turbo',
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    stream: true,
+    n: 1,
+    temperature: 0.3,
+    organizationId: ''
+  }
+
+  constructor (private readonly _context: ExtensionContext) {
+
+  }
+
+  public setSettings (settings: Settings) {
+    this._settings = { ...this._settings, ...settings }
+  }
+
+  public getSettings () {
+    return this._settings
+  }
+
+  public updateLLMSettings () {
+    this._view?.webview.postMessage({
+      type: 'updateSettings',
+      settings: this._settings
+    })
   }
 
   public resolveWebviewView (webviewView: WebviewView) {
@@ -63,7 +88,7 @@ export class SidebarProvider implements WebviewViewProvider {
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
           <title>ColaBOT: AI assistant 🤖</title>
           <script nonce="${nonce}">
-            window.openAIPayload = ${JSON.stringify({ ...openAIPayload, apiKey: this._apiKey })};
+            window.llmSettings = ${JSON.stringify(this._settings)};
             window.currentTheme = ${JSON.stringify(currentTheme)};
             window.accessToken = ${JSON.stringify(Util.getAccessToken())};
           </script>
@@ -85,11 +110,15 @@ export class SidebarProvider implements WebviewViewProvider {
         const text = message.text
 
         switch (command) {
-          case 'payloadSidebarError': {
+          case 'apiKeyMissing': {
             ApiKeySettings.init(this._context)
             const settings = ApiKeySettings.instance
             await settings.storeKeyData(text)
-            execReloadWindow('API key set ✔. Please reload to apply changes.')
+            this.setSettings({ apiKey: text })
+            webview.postMessage({
+              type: 'updateSettings',
+              settings: this._settings
+            })
             break
           }
           case 'apiSidebarError': {
@@ -103,7 +132,7 @@ export class SidebarProvider implements WebviewViewProvider {
               const selectedText = editor.document.getText(selection).trim()
 
               if (selectedText.length > 0) {
-                this._view?.webview.postMessage({
+                webview.postMessage({
                   type: 'selectedText',
                   editor: {
                     selectedText,

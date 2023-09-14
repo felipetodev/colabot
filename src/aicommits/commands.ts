@@ -7,8 +7,9 @@ import {
   generateCommitMessage,
   releaseCommit
 } from '../lib/utils.git'
+import { type Settings } from '../types'
 
-export function aiCommits (apiKey: string) {
+export function aiCommits ({ settings }: { settings: Settings }) {
   const config = workspace.getConfiguration('colaBot')
   const withGitmoji = config.get('gitMoji') as boolean
   const withSemVer = config.get('semanticVersioningSpecification') as boolean
@@ -27,7 +28,7 @@ export function aiCommits (apiKey: string) {
           const promptMessage = await generateCommitMessage(withSemVer)
           if (promptMessage) {
             try {
-              aiCommitMessage = await getApiResponse(promptMessage, apiKey)
+              aiCommitMessage = await getApiResponse(promptMessage, settings)
             } catch (err) {
               window.showErrorMessage(err as any)
             }

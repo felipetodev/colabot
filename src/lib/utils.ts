@@ -1,6 +1,7 @@
 import { window, commands, ProgressLocation, Uri, type Webview, type ProgressOptions } from 'vscode'
 import { OpenAIStream } from '../OpenAI'
 import { type SidebarProvider } from '../panels/SideBar'
+import { type Settings } from '../types'
 
 const progressOptions: ProgressOptions = {
   location: ProgressLocation.Notification,
@@ -25,11 +26,11 @@ export function replaceWithUnicodes (val: string) {
   return val.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-export const getApiResponse = async (comment: string, apiKey: string) => {
+export const getApiResponse = async (comment: string, settings: Settings) => {
   return await window.withProgress(progressOptions, async (progress) => {
     progress.report({ message: 'Loading...' })
 
-    return await OpenAIStream(comment, apiKey)
+    return await OpenAIStream(comment, settings)
   })
 }
 
