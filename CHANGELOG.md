@@ -58,3 +58,13 @@ All notable changes to the "colabot" extension will be documented in this file.
 - Add new shortcuts commands in Sidebar Chat (fix, test, docs, explain)
 - Fix Sidebar Chat styles and improve UI
 - Refact all webview-ui components
+
+## 2.1.0
+
+### Minor Changes
+
+- Add settings config handler
+- Set and remove api key from ColaBOT Chat (no refresh nedeed)
+- Add input api key validation
+- Update dependencies
+- Bug fixes
