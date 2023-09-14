@@ -44,7 +44,10 @@ const Chat = memo(({
         onScroll={handleScroll}
       >
         <SidebarHeader
-          onUpdateConversation={handleSendCommand}
+          onUpdateConversation={(type)  => {
+            messagesEndRef.current?.scrollIntoView(true)
+            handleSendCommand(type)
+          }}
         />
 
         <VSCodeDivider className="block m-0 mt-5 bg-gray-500/10 h-0.5" role="separator" />
