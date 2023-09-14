@@ -2,17 +2,24 @@ import { useEffect, useState } from "react"
 import Chat from './components/Chat'
 import { vscode } from "./utils/vscode"
 import { LangChainStream } from "./utils/opaneai-chain"
-import { type ChatState, type Editor, type Message, VSCodeMessageTypes } from "./types"
+import {
+  type ChatState,
+  type Editor,
+  type Message,
+  type WebviewEventListeners,
+  type LLMProviderSettings,
+  VSCodeMessageTypes
+} from "./types"
 
 function App() {
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
-  const [editor, setEditor] = useState<Editor>(null)
+  const [editor, setEditor] = useState<Editor | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const [triggerCommand, setTriggerCommand] = useState<boolean>(false)
+  const [config, setConfig] = useState<LLMProviderSettings | null>(null)
 
   const handleSend = async (message: string) => {
-    const payload = window.openAIPayload
-    if (!payload?.apiKey) {
+    const llmSettings = config || window.llmSettings
+    if (!llmSettings?.apiKey) {
       const isMessageWithError = chatState.slice(-1)[0]?.error
       if (isMessageWithError) return
       setChatState((prev) => [
@@ -45,7 +52,7 @@ function App() {
       await LangChainStream(
         chatUpdate,
         selectedText,
-        payload,
+        llmSettings,
         ({ message }: { message: string }) => {
           if (message === '[DONE]' || message === '[ERROR]') {
             setEditor(null)
@@ -100,17 +107,17 @@ function App() {
 
   useEffect(() => {
     const cbListener = (event: MessageEvent) => {
-      const { type, editor } = event.data as { type: 'selectedText' | 'clearChat', editor: Editor }
+      const { type, editor, settings } = event.data as WebviewEventListeners
 
       if (type === 'selectedText') {
         setEditor(editor)
-        if (editor?.selectedText && editor.prompt) {
-          return setTriggerCommand(true)
-        }
       }
       if (type === 'clearChat') {
         setChatState([])
         vscode.setState([])
+      }
+      if (type === 'updateSettings') {
+        setConfig(settings)
       }
     }
 
@@ -123,19 +130,20 @@ function App() {
 
   useEffect(() => {
     // effect to handle an updated chatState
-    if (triggerCommand && editor) {
+    if (editor?.selectedText && editor.prompt) {
       handleSendCommand({
         code: editor.selectedText,
-        type: editor.prompt!
+        type: editor.prompt
       })
-      setTriggerCommand(false)
+      setEditor(null)
     }
-  }, [triggerCommand])
+  }, [editor?.prompt])
 
   const handleSendCommand = async ({ code, type }: { code?: string, type: 'explain' | 'fix' | 'test' }) => {
-    const selectedText = editor?.selectedText ?? code
+    const selectedText = code ?? editor?.selectedText
     if (!selectedText) return
     setLoading(true)
+    const llmSettings = config || window.llmSettings
     const promptCommand = `/${type}`
     let chatUpdate: ChatState = [...chatState, { role: 'user', content: promptCommand }]
     setChatState(chatUpdate)
@@ -146,7 +154,7 @@ function App() {
       await LangChainStream(
         chatUpdate,
         selectedText,
-        window.openAIPayload!,
+        llmSettings,
         ({ message }: { message: string }) => {
           if (message === '[DONE]' || message === '[ERROR]') {
             setEditor(null)
@@ -194,10 +202,10 @@ function App() {
     const lastChat = chatState.slice(-1)[0]
     setChatState((prev) => [
       ...prev.slice(0, -1),
-      { ...lastChat, content: `API Key setted!\nPlease reload to apply changes.`, error: false }
+      { ...lastChat, content: 'API key set up correctly!', error: false }
     ])
     vscode.postMessage({
-      command: VSCodeMessageTypes.PayloadSidebarError,
+      command: VSCodeMessageTypes.ApiKeyMissing,
       text: key,
     })
   }

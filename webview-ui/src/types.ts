@@ -1,9 +1,7 @@
 declare global {
   interface Window {
-    responseText?: string;
-    sidebar?: boolean;
-    openAIPayload?: OpenAIStreamPayload;
     currentTheme?: string;
+    llmSettings: LLMProviderSettings;
   }
 }
 
@@ -16,8 +14,7 @@ export type Message = {
 
 export type ChatState = Array<Message>
 
-export type OpenAIStreamPayload = {
-  provider: 'openai';
+export type LLMProviderSettings = {
   model: 'gpt-3.5-turbo' | 'gpt-3.5-turbo-16k' | 'gpt-4' | 'gpt-4-32k' | string;
   temperature: number;
   top_p: number;
@@ -34,13 +31,20 @@ export type Editor = {
   selectedText: string
   language: string
   prompt?: 'explain' | 'fix' | 'test'
-} | null
+}
 
 export enum VSCodeMessageTypes {
   CopyToClipboard = 'copyToClipboard',
   SelectedText = 'selectedText',
-  PayloadSidebarError = 'payloadSidebarError',
+  ApiKeyMissing = 'apiKeyMissing',
   ApiSidebarError = 'apiSidebarError',
   CloseWebviewPanel = 'closeWebviewPanel',
   ReplaceSelectedCode = 'replaceSelectedCode',
+  UpdateSettings = 'updateSettings'
+}
+
+export type WebviewEventListeners = {
+  type: 'selectedText' | 'clearChat' | 'updateSettings'
+  editor: Editor | null
+  settings: LLMProviderSettings
 }

@@ -6,7 +6,7 @@ import {
 } from "langchain/prompts";
 import { LLMChain } from "langchain/chains";
 
-import { type ChatState, OpenAIStreamPayload } from "../types"
+import { type ChatState, type LLMProviderSettings } from "../types"
 
 const commands = {
   '/explain': 'Explain the following code snippet:',
@@ -18,7 +18,7 @@ const commands = {
 export async function LangChainStream (
   chatUpdate: ChatState,
   selectedText: string,
-  vsCodePayload: OpenAIStreamPayload,
+  llmSettings: LLMProviderSettings,
   cb: any
 ) {
   let prompt = chatUpdate.slice(-1)[0].content
@@ -40,7 +40,7 @@ export async function LangChainStream (
     presence_penalty: presencePenalty,
     // stream: streaming
     organizationId
-  } = vsCodePayload
+  } = llmSettings
 
   const chat = new ChatOpenAI({
     temperature,
