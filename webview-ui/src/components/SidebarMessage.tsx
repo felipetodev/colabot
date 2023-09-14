@@ -1,4 +1,4 @@
-import { useRef, memo, type FormEvent } from 'react'
+import { useState, useRef, memo, type FormEvent } from 'react'
 import CodeBlock from './CodeBlock';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm';
@@ -16,13 +16,30 @@ const SidebarMessage = memo(function SidebarMessage({
   error = false,
   onHandleApiKey
 }: Props) {
+  const [errorKey, setErrorKey] = useState('')
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!inputRef.current || !inputRef.current.value.trim()) return
+
+    const keyPattern = /sk-\w{20}T3BlbkFJ\w{20}/g
+    const isValid = keyPattern.test(inputRef.current.value)
+
+    if (!isValid) {
+      setErrorKey('Invalid API key, try again')
+      inputRef.current.value = ''
+      inputRef.current.focus()
+      const timeout = setTimeout(() => {
+        setErrorKey('')
+      }, 3000)
+
+      return () => clearTimeout(timeout)
+    }
+
     onHandleApiKey({ key: inputRef.current.value })
   }
+
   return (
     <>
       <div className={`py-4 ${role === 'user' ? '' : 'bg-[var(--vscode-editor-background)]'}`}>
@@ -78,8 +95,8 @@ const SidebarMessage = memo(function SidebarMessage({
                   <input
                     ref={inputRef}
                     type="password"
-                    className="mt-1.5 h-6 bg-[var(--vscode-input-background)] p-2 focus:outline-[var(--vscode-focusBorder)] placeholder:opacity-50"
-                    placeholder="•••••"
+                    className={`mt-1.5 h-6 bg-[var(--vscode-input-background)] p-2 placeholder:opacity-50 ${errorKey ? 'focus:outline-red-500' : 'focus:outline-[var(--vscode-focusBorder)]'}`}
+                    placeholder={errorKey ? errorKey : '•••••'}
                   />
                   <button type='submit' className='hover:text-green-600'>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
