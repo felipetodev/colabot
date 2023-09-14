@@ -10,26 +10,26 @@
     "watch": "tsc && vite build --watch"
   },
   "dependencies": {
-    "@vscode/webview-ui-toolkit": "^1.2.2",
+    "@vscode/webview-ui-toolkit": "1.2.2",
     "just-throttle": "4.2.0",
-    "langchain": "0.0.97",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-markdown": "8.0.6",
+    "langchain": "0.0.149",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-markdown": "8.0.7",
     "react-syntax-highlighter": "15.5.0",
     "remark-gfm": "3.0.1",
-    "uuid": "9.0.0"
+    "uuid": "9.0.1"
   },
   "devDependencies": {
-    "@types/react": "^18.0.27",
-    "@types/react-dom": "^18.0.10",
-    "@types/react-syntax-highlighter": "15.5.6",
-    "@types/uuid": "9.0.1",
-    "@types/vscode-webview": "^1.57.1",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@types/react-syntax-highlighter": "15.5.7",
+    "@types/uuid": "9.0.4",
+    "@types/vscode-webview": "^1.57.2",
     "@vitejs/plugin-react-swc": "^3.0.0",
-    "autoprefixer": "^10.4.13",
-    "postcss": "^8.4.21",
-    "tailwindcss": "^3.2.7",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.29",
+    "tailwindcss": "^3.3.3",
     "typescript": "^4.9.3",
     "vite": "^4.1.0"
   }
