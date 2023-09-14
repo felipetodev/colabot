@@ -95,8 +95,9 @@ export async function generateCommitMessage (withSemVer: boolean) {
   const prompt = `${promptTemplate(withSemVer)}\n${staged.diff}`
 
   /**
-   * text-davinci-003 & gpt-3.5-turbo has a token limit of 4000
-   * https://platform.openai.com/docs/models/overview#:~:text=to%20Sep%202021-,text%2Ddavinci%2D003,-Can%20do%20any
+   * max tokens limits
+   * https://platform.openai.com/docs/models/gpt-3-5
+   * https://platform.openai.com/docs/models/gpt-4
    */
 
   if (prompt.length > 4000) {
