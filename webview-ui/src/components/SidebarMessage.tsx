@@ -85,6 +85,13 @@ const SidebarMessage = memo(function SidebarMessage({
                           {children}
                         </code>
                         )
+                  },
+                  a ({ node, children, ...props }) {
+                    return (
+                      <a className='text-[var(--vscode-textLink-foreground)]' {...props}>
+                        {children}
+                      </a>
+                    )
                   }
                 }}
               >

@@ -27,7 +27,7 @@ function App() {
         {
           role: 'system',
           error: true,
-          content: `You must set an **OpenAI** API key:`
+          content: `You must set an [**OpenAI** API key](https://platform.openai.com/account/api-keys):`
         }
       ])
       return
