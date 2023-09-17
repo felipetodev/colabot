@@ -227,5 +227,5 @@
     "vscode:prepublish": "pnpm run compile",
     "watch": "tsc -watch -p ./"
   },
-  "version": "2.1.0"
+  "version": "2.1.2"
 }
