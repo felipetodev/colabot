@@ -147,7 +147,7 @@ export class SidebarProvider implements WebviewViewProvider {
             const editor = window.activeTextEditor
             if (editor) {
               const selection = editor.selection
-              editor.document.getText(selection) && editor.edit((editBuilder) => {
+              editor.document.getText(selection) || editor.edit((editBuilder) => {
                 editBuilder.replace(selection, text)
               })
             }
