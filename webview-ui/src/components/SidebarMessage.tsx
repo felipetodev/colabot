@@ -63,7 +63,7 @@ const SidebarMessage = memo(function SidebarMessage({
               </h1>
             </div>
           )}
-          <div className='flex-1 items-center whitespace-pre-wrap overflow-x-auto'>
+          <div className='flex-1 items-center whitespace-pre-wrap'>
             <div className='w-full break-words prose-invert'>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}

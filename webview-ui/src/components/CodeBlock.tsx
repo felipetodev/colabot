@@ -22,8 +22,8 @@ export default function CodeBlock({ language, value }: Props) {
     });
   }
   return (
-    <div className="codeblock relative group/item">
-      <div className='flex absolute invisible rounded-[0.3em] p-0.5 -top-2 right-3.5 group-hover/item:visible cursor-pointer bg-[var(--vscode-sideBar-background)]'>
+    <div className="codeblock relative group/item rounded-[4px]">
+      <div className='flex absolute invisible rounded-[0.3em] p-0.5 -top-2 right-3.5 group-hover/item:visible cursor-pointer bg-[var(--vscode-sideBar-background)] border border-[var(--vscode-chat-requestBorder)]'>
         <button title='Copy' onClick={handleCopyClipboard}>
           <svg className="h-5 w-5 hover:opacity-70" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
             <g fill="none" fillRule="evenodd" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" transform="translate(3 3)">
