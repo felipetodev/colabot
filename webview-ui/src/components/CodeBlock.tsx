@@ -22,7 +22,7 @@ export default function CodeBlock({ language, value }: Props) {
     });
   }
   return (
-    <div className="codeblock relative group/item rounded-[4px]">
+    <div className="codeblock relative group/item">
       <div className='flex absolute invisible rounded-[0.3em] p-0.5 -top-2 right-3.5 group-hover/item:visible cursor-pointer bg-[var(--vscode-sideBar-background)] border border-[var(--vscode-chat-requestBorder)]'>
         <button title='Copy' onClick={handleCopyClipboard}>
           <svg className="h-5 w-5 hover:opacity-70" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
@@ -32,7 +32,7 @@ export default function CodeBlock({ language, value }: Props) {
             </g>
           </svg>
         </button>
-        <button title='Replace' onClick={handleReplaceCode}>
+        <button title='Insert at Cursor' onClick={handleReplaceCode}>
           <svg className='hover:opacity-70' height="21" viewBox="0 0 21 21" width="21" xmlns="http://www.w3.org/2000/svg">
             <g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" transform="translate(4 3)">
               <path d="m3.5 1.5c-.44119105-.00021714-1.03893772-.0044496-1.99754087-.00501204-.51283429-.00116132-.93645365.3838383-.99544161.88103343l-.00701752.11906336v10.99753785c.00061498.5520447.44795562.9996604 1 1.0006148l10 .0061982c.5128356.0008356.9357441-.3849039.993815-.882204l.006185-.1172316v-11c0-.55228475-.4477152-1-1-1-.8704853-.00042798-1.56475733.00021399-2 0" />
@@ -45,13 +45,15 @@ export default function CodeBlock({ language, value }: Props) {
           </svg>
         </button>
       </div>
-      <SyntaxHighlighter
-        language={language}
-        style={oneDark}
-        customStyle={{ margin: 0 }}
-      >
-        {value}
-      </SyntaxHighlighter>
+      <div className='overflow-hidden rounded'>
+        <SyntaxHighlighter
+          language={language}
+          style={oneDark}
+          customStyle={{ margin: 0 }}
+        >
+          {value}
+        </SyntaxHighlighter>
+      </div>
     </div>
   )
 }
