@@ -150,6 +150,7 @@ export class SidebarProvider implements WebviewViewProvider {
               editor.document.getText(selection) || editor.edit((editBuilder) => {
                 editBuilder.replace(selection, text)
               })
+              window.showTextDocument(editor.document, editor.viewColumn)
             }
             break
           }
