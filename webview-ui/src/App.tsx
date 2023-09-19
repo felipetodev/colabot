@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react"
 import Chat from './components/Chat'
 import { vscode } from "./utils/vscode"
+import { useMessageHandler } from "./hooks/useMessageHandler"
 import { LangChainStream } from "./utils/opaneai-chain"
 import {
   type ChatState,
-  type Editor,
   type Message,
-  type WebviewEventListeners,
-  type LLMProviderSettings,
   VSCodeMessageTypes
 } from "./types"
 
 function App() {
   const [chatState, setChatState] = useState<ChatState>(vscode.getState() as ChatState || [])
-  const [editor, setEditor] = useState<Editor | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const [config, setConfig] = useState<LLMProviderSettings | null>(null)
+  const { config, editor, setEditor } = useMessageHandler({ setChatState })
 
   const handleSend = async (message: string) => {
     const llmSettings = config || window.llmSettings
@@ -104,29 +101,6 @@ function App() {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    const cbListener = (event: MessageEvent) => {
-      const { type, editor, settings } = event.data as WebviewEventListeners
-
-      if (type === 'selectedText') {
-        setEditor(editor)
-      }
-      if (type === 'clearChat') {
-        setChatState([])
-        vscode.setState([])
-      }
-      if (type === 'updateSettings') {
-        setConfig(settings)
-      }
-    }
-
-    window.addEventListener('message', cbListener)
-
-    return () => {
-      window.removeEventListener('message', cbListener)
-    }
-  }, [])
 
   useEffect(() => {
     // effect to handle an updated chatState
