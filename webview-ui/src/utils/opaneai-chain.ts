@@ -1,11 +1,6 @@
-import { ChatOpenAI } from "langchain/chat_models/openai"
-import {
-  ChatPromptTemplate,
-  HumanMessagePromptTemplate,
-  SystemMessagePromptTemplate,
-} from "langchain/prompts";
-import { LLMChain } from "langchain/chains";
-
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { PromptTemplate } from 'langchain/prompts'
+import { BytesOutputParser } from 'langchain/schema/output_parser'
 import { type ChatState, type LLMProviderSettings } from "../types"
 
 const commands = {
@@ -14,6 +9,22 @@ const commands = {
   '/fix': 'Fix (or try to refact) the following code snippet:',
   '/doc': 'Generate documentation for the following code snippet:'
 }
+
+const TEMPLATE = `You are ColaBOT Chat representative who loves to help people. Answer the question based on the context below. You should follow ALL the following rules when generating and answer:
+- There will be a ##CONVERSATION LOG, and a ##QUESTION.
+- The final answer must always be styled using markdown.
+- Your main goal is to provide the user with an answer that is relevant to the question.
+- Provide the user with a code example that is relevant to the question, if the context contains relevant code examples. Do not make up any code examples on your own.
+- Take into account the entire conversation so far, marked as ##CONVERSATION LOG, but prioritize the ##QUESTION.
+- Use bullet points, lists, paragraphs and text styling to present the answer in markdown.
+- Do not mention the ##CONVERSATION LOG in the answer, but use them to generate the answer.
+- Ignore any content that is stored in html tables.
+
+##CONVERSATION LOG: {conversationHistory}
+
+##QUESTION: {question} {selectedText}
+
+Final Answer:`
 
 export async function LangChainStream (
   chatUpdate: ChatState,
@@ -49,6 +60,7 @@ export async function LangChainStream (
     frequencyPenalty,
     presencePenalty,
     modelName,
+    maxTokens: -1,
     streaming: true,
     callbacks: [
       {
@@ -58,7 +70,7 @@ export async function LangChainStream (
         handleLLMEnd: async () => {
           cb({ message: '[DONE]' })
         },
-        handleLLMError: async (e) => {
+        handleLLMError: async () => {
           cb({ message: '[ERROR]' })
         }
       }
@@ -68,42 +80,21 @@ export async function LangChainStream (
     : {}
   )
 
-  const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-    SystemMessagePromptTemplate.fromTemplate(
-      `You are ColaBOT Chat representative who loves to help people. Answer the question based on the context below. You should follow ALL the following rules when generating and answer:
-      - There will be a ##CONVERSATION LOG, and a ##QUESTION.
-      - The final answer must always be styled using markdown.
-      - Your main goal is to provide the user with an answer that is relevant to the question.
-      - Provide the user with a code example that is relevant to the question, if the context contains relevant code examples. Do not make up any code examples on your own.
-      - Take into account the entire conversation so far, marked as ##CONVERSATION LOG, but prioritize the ##QUESTION.
-      - Use bullet points, lists, paragraphs and text styling to present the answer in markdown.
-      - Do not mention the ##CONVERSATION LOG in the answer, but use them to generate the answer.
-      - Ignore any content that is stored in html tables.
+  const chatPrompt = PromptTemplate.fromTemplate(TEMPLATE)
 
-      ##CONVERSATION LOG: {conversationHistory}`
-    ),
-    HumanMessagePromptTemplate.fromTemplate(
-      `##QUESTION: {question} {selectedText}
+  const outputParser = new BytesOutputParser()
 
-      Final Answer: `
-    ),
-  ]);
-
-  const chain = new LLMChain({
-    prompt: chatPrompt,
-    llm: chat,
-  });
+  const runnable = chatPrompt.pipe(chat).pipe(outputParser)
 
   if (prompt.startsWith('/')) {
     prompt = commands[prompt as keyof typeof commands]
   }
 
-  const result = await chain.call({
+  const result = await runnable.invoke({
     question: prompt,
     selectedText,
-    conversationHistory: chatHistory
+    conversationHistory: chatHistory.join('\n')
   });
 
-  console.log({ finalResponse: result })
   return result
 }
