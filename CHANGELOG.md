@@ -68,3 +68,9 @@ All notable changes to the "colabot" extension will be documented in this file.
 - Add input api key validation
 - Update dependencies
 - Bug fixes
+
+## 2.1.5
+
+### Minor Changes
+
+- Fix llm chain response
