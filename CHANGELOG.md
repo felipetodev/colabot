@@ -74,3 +74,9 @@ All notable changes to the "colabot" extension will be documented in this file.
 ### Minor Changes
 
 - Fix llm chain response
+
+## 2.1.6
+
+### Minor Changes
+
+- Add OpenAI GPT-4-turbo model
